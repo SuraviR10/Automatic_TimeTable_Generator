@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global Admin Dashboard - MIT Mysore</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        h1 { color: #667eea; margin-bottom: 30px; text-align: center; }
+        .section { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #667eea; }
+        .section h2 { color: #333; margin-bottom: 15px; font-size: 18px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; }
+        input:focus, select:focus { border-color: #667eea; outline: none; }
+        .btn { padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 20px; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; }
+        .alert-success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+        .day-selector { display: flex; gap: 10px; flex-wrap: wrap; }
+        .day-checkbox { display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: white; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; }
+        .day-checkbox input { width: auto; }
+        .day-checkbox:has(input:checked) { background: #667eea; color: white; border-color: #667eea; }
+        .preview { background: white; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px solid #667eea; }
+        .preview h3 { color: #667eea; margin-bottom: 10px; }
+        .oe-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .oe-table th, .oe-table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        .oe-table th { background: #667eea; color: white; }
+        .oe-table tr:hover { background: #f8f9fa; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .admin-badge { background: #ede9fe; color: #7c3aed; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="admin-header">
+            <h1 style="margin-bottom:0;">Global Admin Dashboard</h1>
+            <div style="display:flex;align-items:center;gap:15px;">
+                <span class="admin-badge" id="adminBadge">Admin</span>
+                <button class="btn btn-danger" onclick="adminLogout()" style="margin-top:0;padding:8px 20px;font-size:14px;">Logout</button>
+            </div>
+        </div>
+
+        <div id="alertBox"></div>
+
+        <!-- Work Week Configuration -->
+        <div class="section">
+            <h2>Dynamic Work Week Configuration</h2>
+            <label>Select Working Days:</label>
+            <div class="day-selector">
+                <label class="day-checkbox"><input type="checkbox" value="Monday"> Monday</label>
+                <label class="day-checkbox"><input type="checkbox" value="Tuesday" checked> Tuesday</label>
+                <label class="day-checkbox"><input type="checkbox" value="Wednesday" checked> Wednesday</label>
+                <label class="day-checkbox"><input type="checkbox" value="Thursday" checked> Thursday</label>
+                <label class="day-checkbox"><input type="checkbox" value="Friday" checked> Friday</label>
+                <label class="day-checkbox"><input type="checkbox" value="Saturday" checked> Saturday</label>
+                <label class="day-checkbox"><input type="checkbox" value="Sunday"> Sunday</label>
+            </div>
+        </div>
+
+        <!-- Time Slots Configuration -->
+        <div class="section">
+            <h2>Master Time Slots Configuration</h2>
+            <div class="form-grid">
+                <div><label>Start Time:</label><input type="time" id="startTime" value="09:00"></div>
+                <div><label>End Time:</label><input type="time" id="endTime" value="16:00"></div>
+                <div><label>Period Duration (minutes):</label><input type="number" id="periodDuration" value="60" min="30" max="120"></div>
+                <div><label>Periods Per Day:</label><input type="number" id="periodsPerDay" value="6" min="4" max="10"></div>
+            </div>
+        </div>
+
+        <!-- Break Management -->
+        <div class="section">
+            <h2>Break Management</h2>
+            <div class="form-grid">
+                <div><label>Tea Break Start:</label><input type="time" id="teaBreakStart" value="11:00"></div>
+                <div><label>Tea Break End:</label><input type="time" id="teaBreakEnd" value="11:15"></div>
+                <div><label>Tea Break After Period:</label><input type="number" id="teaBreakAfter" value="2" min="1" max="10"></div>
+            </div>
+            <div class="form-grid" style="margin-top:15px;">
+                <div><label>Lunch Break Start:</label><input type="time" id="lunchBreakStart" value="13:15"></div>
+                <div><label>Lunch Break End:</label><input type="time" id="lunchBreakEnd" value="14:00"></div>
+                <div><label>Lunch Break After Period:</label><input type="number" id="lunchBreakAfter" value="4" min="1" max="10"></div>
+            </div>
+            <div class="preview">
+                <h3>Lab Placement Validation</h3>
+                <p id="labValidation">Labs cannot be placed in periods 2-3 (Tea Break) or 4-5 (Lunch Break)</p>
+            </div>
+        </div>
+
+        <!-- Open Elective Mega-Constraint -->
+        <div class="section">
+            <h2>Open Elective (OE) Mega-Constraint</h2>
+            <p style="color:#721c24;background:#f8d7da;padding:10px;border-radius:6px;margin-bottom:15px;">
+                <strong>Critical:</strong> OE subjects for a specific year must be locked to the SAME time-slot across ALL departments and sections.
+            </p>
+            <div class="form-grid">
+                <div><label>Academic Year:</label><input type="text" id="oeAcademicYear" placeholder="e.g., 2024-25"></div>
+                <div><label>Year:</label>
+                    <select id="oeYear">
+                        <option value="1">1st Year</option><option value="2">2nd Year</option>
+                        <option value="3" selected>3rd Year</option><option value="4">4th Year</option>
+                    </select>
+                </div>
+                <div><label>Semester:</label>
+                    <select id="oeSemester">
+                        <option value="5">Semester 5</option><option value="6" selected>Semester 6</option>
+                        <option value="7">Semester 7</option><option value="8">Semester 8</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-grid" style="margin-top:15px;">
+                <div><label>OE Subject Code:</label><input type="text" id="oeSubjectCode" placeholder="e.g., OE601"></div>
+                <div><label>OE Subject Name:</label><input type="text" id="oeSubjectName" placeholder="e.g., Machine Learning"></div>
+                <div><label>Locked Day:</label>
+                    <select id="oeLockedDay">
+                        <option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option><option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                    </select>
+                </div>
+                <div><label>Locked Time Slot:</label>
+                    <select id="oeLockedSlot">
+                        <option value="1">Period 1</option><option value="2">Period 2</option>
+                        <option value="3">Period 3</option><option value="4">Period 4</option>
+                        <option value="5">Period 5</option><option value="6">Period 6</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" onclick="addOEConstraint()">Lock OE Slot</button>
+            <table class="oe-table" id="oeTable">
+                <thead>
+                    <tr><th>Academic Year</th><th>Year</th><th>Semester</th><th>OE Subject</th><th>Locked Slot</th><th>Action</th></tr>
+                </thead>
+                <tbody id="oeTableBody"></tbody>
+            </table>
+        </div>
+
+        <button class="btn" onclick="saveGlobalSettings()" style="width:100%;font-size:18px;">Save Global Configuration</button>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://bkmzyhroignpjebfpqug.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrbXp5aHJvaWducGplYmZwcXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MjA1NDUsImV4cCI6MjA3Mjk5NjU0NX0.ICE2eYzFZvz0dtNpAa5YlJTZD-idc2J76wn1ZeHwwck';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Auth gate — redirect to index if not logged in
+        (function checkAuth() {
+            if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+                window.location.href = 'index.htm';
+            }
+            const username = sessionStorage.getItem('adminUsername') || 'Admin';
+            document.getElementById('adminBadge').textContent = username;
+        })();
+
+        function adminLogout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminUsername');
+            window.location.href = 'index.htm';
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alertBox.innerHTML = '', 5000);
+        }
+
+        async function saveGlobalSettings() {
+            try {
+                const workDays = Array.from(document.querySelectorAll('.day-checkbox input:checked')).map(cb => cb.value);
+                if (workDays.length < 5) { showAlert('Please select at least 5 working days', 'danger'); return; }
+
+                const settings = [
+                    { setting_key: 'work_days',               setting_value: JSON.stringify(workDays),                              updated_by: 'ADMIN' },
+                    { setting_key: 'start_time',              setting_value: document.getElementById('startTime').value,            updated_by: 'ADMIN' },
+                    { setting_key: 'end_time',                setting_value: document.getElementById('endTime').value,              updated_by: 'ADMIN' },
+                    { setting_key: 'period_duration',         setting_value: document.getElementById('periodDuration').value,       updated_by: 'ADMIN' },
+                    { setting_key: 'periods_per_day',         setting_value: document.getElementById('periodsPerDay').value,        updated_by: 'ADMIN' },
+                    { setting_key: 'tea_break_start',         setting_value: document.getElementById('teaBreakStart').value,        updated_by: 'ADMIN' },
+                    { setting_key: 'tea_break_end',           setting_value: document.getElementById('teaBreakEnd').value,          updated_by: 'ADMIN' },
+                    { setting_key: 'tea_break_after_period',  setting_value: document.getElementById('teaBreakAfter').value,        updated_by: 'ADMIN' },
+                    { setting_key: 'lunch_break_start',       setting_value: document.getElementById('lunchBreakStart').value,      updated_by: 'ADMIN' },
+                    { setting_key: 'lunch_break_end',         setting_value: document.getElementById('lunchBreakEnd').value,        updated_by: 'ADMIN' },
+                    { setting_key: 'lunch_break_after_period',setting_value: document.getElementById('lunchBreakAfter').value,      updated_by: 'ADMIN' }
+                ];
+
+                for (const setting of settings) {
+                    await supabase.from('global_settings').upsert(setting, { onConflict: 'setting_key' });
+                }
+                showAlert('Global settings saved! All departments will use these settings.', 'success');
+            } catch (error) {
+                showAlert('Error saving settings: ' + error.message, 'danger');
+            }
+        }
+
+        async function addOEConstraint() {
+            try {
+                const oeData = {
+                    academic_year:    document.getElementById('oeAcademicYear').value,
+                    year:             parseInt(document.getElementById('oeYear').value),
+                    semester:         parseInt(document.getElementById('oeSemester').value),
+                    oe_subject_code:  document.getElementById('oeSubjectCode').value.trim().toUpperCase(),
+                    oe_subject_name:  document.getElementById('oeSubjectName').value.trim(),
+                    locked_day:       document.getElementById('oeLockedDay').value,
+                    locked_time_slot: parseInt(document.getElementById('oeLockedSlot').value)
+                };
+                if (!oeData.academic_year || !oeData.oe_subject_code || !oeData.oe_subject_name) {
+                    showAlert('Please fill all OE fields', 'danger'); return;
+                }
+                const { error } = await supabase.from('open_electives').insert([oeData]);
+                if (error) throw error;
+                showAlert('OE Constraint locked! This will apply to ALL departments.', 'success');
+                document.getElementById('oeSubjectCode').value = '';
+                document.getElementById('oeSubjectName').value = '';
+                loadOEConstraints();
+            } catch (error) {
+                showAlert('Error adding OE constraint: ' + error.message, 'danger');
+            }
+        }
+
+        async function loadOEConstraints() {
+            try {
+                const { data, error } = await supabase.from('open_electives').select('*').order('academic_year', { ascending: false });
+                if (error) throw error;
+                document.getElementById('oeTableBody').innerHTML = (data || []).map(oe => `
+                    <tr>
+                        <td>${oe.academic_year}</td>
+                        <td>Year ${oe.year}</td>
+                        <td>Sem ${oe.semester}</td>
+                        <td><strong>${oe.oe_subject_code}</strong> - ${oe.oe_subject_name}</td>
+                        <td>${oe.locked_day} P${oe.locked_time_slot}</td>
+                        <td><button onclick="deleteOE(${oe.id})" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Delete</button></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading OE constraints:', error);
+            }
+        }
+
+        async function deleteOE(id) {
+            if (confirm('Delete this OE constraint? This will affect ALL departments!')) {
+                await supabase.from('open_electives').delete().eq('id', id);
+                showAlert('OE constraint deleted', 'success');
+                loadOEConstraints();
+            }
+        }
+
+        document.getElementById('teaBreakAfter').addEventListener('input', updateLabValidation);
+        document.getElementById('lunchBreakAfter').addEventListener('input', updateLabValidation);
+
+        function updateLabValidation() {
+            const tea = document.getElementById('teaBreakAfter').value;
+            const lunch = document.getElementById('lunchBreakAfter').value;
+            document.getElementById('labValidation').textContent =
+                `Labs cannot be placed in periods ${tea}-${parseInt(tea)+1} (Tea Break) or ${lunch}-${parseInt(lunch)+1} (Lunch Break)`;
+        }
+
+        async function loadSettings() {
+            try {
+                const { data } = await supabase.from('global_settings').select('*');
+                if (!data) return;
+                const settings = {};
+                data.forEach(row => settings[row.setting_key] = row.setting_value);
+
+                if (settings.work_days) {
+                    const days = JSON.parse(settings.work_days);
+                    document.querySelectorAll('.day-checkbox input').forEach(cb => { cb.checked = days.includes(cb.value); });
+                }
+                if (settings.start_time)              document.getElementById('startTime').value = settings.start_time;
+                if (settings.end_time)                document.getElementById('endTime').value = settings.end_time;
+                if (settings.period_duration)         document.getElementById('periodDuration').value = settings.period_duration;
+                if (settings.periods_per_day)         document.getElementById('periodsPerDay').value = settings.periods_per_day;
+                if (settings.tea_break_start)         document.getElementById('teaBreakStart').value = settings.tea_break_start;
+                if (settings.tea_break_end)           document.getElementById('teaBreakEnd').value = settings.tea_break_end;
+                if (settings.tea_break_after_period)  document.getElementById('teaBreakAfter').value = settings.tea_break_after_period;
+                if (settings.lunch_break_start)       document.getElementById('lunchBreakStart').value = settings.lunch_break_start;
+                if (settings.lunch_break_end)         document.getElementById('lunchBreakEnd').value = settings.lunch_break_end;
+                if (settings.lunch_break_after_period)document.getElementById('lunchBreakAfter').value = settings.lunch_break_after_period;
+                updateLabValidation();
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        loadSettings();
+        loadOEConstraints();
+    </script>
+</body>
+</html>
