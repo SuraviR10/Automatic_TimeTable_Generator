@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timetable Generator | Login</title>
+  <style>
+    body { 
+      font-family: "Segoe UI", Arial, sans-serif; 
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%); 
+      margin: 0; 
+      padding: 0; 
+      color: #1e293b; 
+      min-height: 100vh; 
+    }
+    
+    .header { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 20px; 
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); 
+      border-bottom: 3px solid #1e40af; 
+      flex-wrap: wrap; 
+      box-shadow: 0 4px 20px rgba(30,64,175,0.3); 
+    }
+    
+    .header img { 
+      max-height: 80px; 
+      width: auto; 
+      border-radius: 50%; 
+      border: 3px solid rgba(255,255,255,0.3); 
+    }
+    
+    .header-text { 
+      text-align: center; 
+      flex: 1; 
+      min-width: 280px; 
+    }
+    
+    .header-text h1 { 
+      margin: 4px 0; 
+      font-weight: bold; 
+      font-size: 16px; 
+      line-height: 1.3; 
+      color: white; 
+    }
+    
+    .header-text h1:nth-child(2) { 
+      font-size: 20px; 
+      margin: 6px 0; 
+    }
+    
+    .page-wrap { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: calc(100vh - 140px); 
+      padding: 30px 20px; 
+    }
+    
+    .cards-row { 
+      display: flex; 
+      gap: 30px; 
+      flex-wrap: wrap; 
+      justify-content: center; 
+      align-items: flex-start; 
+    }
+    
+    .container { 
+      background: white; 
+      padding: 40px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 40px rgba(30,64,175,0.15); 
+      width: 420px; 
+      text-align: center; 
+      border: 1px solid #e0f2fe; 
+    }
+    
+    .container.admin-card { 
+      border-color: #7c3aed; 
+      box-shadow: 0 10px 40px rgba(124,58,237,0.15); 
+    }
+    
+    /* User Type Selection Screen */
+    .user-type-selector { 
+      background: white; 
+      padding: 50px 40px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 40px rgba(30,64,175,0.15); 
+      width: 100%; 
+      max-width: 600px; 
+      text-align: center; 
+      border: 1px solid #e0f2fe; 
+    }
+    
+    .user-type-selector h2 { 
+      margin-bottom: 10px; 
+      color: #1e40af; 
+      font-size: 28px; 
+      font-weight: 700; 
+    }
+    
+    .user-type-selector p { 
+      color: #64748b; 
+      margin-bottom: 40px; 
+      font-size: 15px; 
+    }
+    
+    .type-buttons { 
+      display: flex; 
+      gap: 20px; 
+      justify-content: center; 
+      flex-wrap: wrap; 
+    }
+    
+    .type-button { 
+      flex: 1; 
+      min-width: 200px; 
+      padding: 25px 20px; 
+      border: 2px solid #e0f2fe; 
+      border-radius: 12px; 
+      background: #f8fafc; 
+      cursor: pointer; 
+      transition: all 0.3s ease; 
+      text-align: center; 
+      text-decoration: none; 
+      color: inherit; 
+    }
+    
+    .type-button:hover { 
+      border-color: #3b82f6; 
+      background: white; 
+      transform: translateY(-4px); 
+      box-shadow: 0 8px 25px rgba(59,130,246,0.15); 
+    }
+    
+    .type-button.admin { 
+      border-color: #ede9fe; 
+    }
+    
+    .type-button.admin:hover { 
+      border-color: #7c3aed; 
+      box-shadow: 0 8px 25px rgba(124,58,237,0.15); 
+    }
+    
+    .type-button h3 { 
+      margin: 0 0 10px 0; 
+      font-size: 20px; 
+      color: #1e40af; 
+    }
+    
+    .type-button.admin h3 { 
+      color: #7c3aed; 
+    }
+    
+    .type-button p { 
+      margin: 0; 
+      font-size: 13px; 
+      color: #64748b; 
+    }
+    
+    .type-button .icon { 
+      font-size: 32px; 
+      margin-bottom: 10px; 
+    }
+    
+    h2 { 
+      margin-bottom: 25px; 
+      color: #1e40af; 
+      font-size: 26px; 
+      font-weight: 700; 
+    }
+    
+    .admin-card h2 { 
+      color: #7c3aed; 
+    }
+    
+    label { 
+      font-size: 14px; 
+      display: block; 
+      text-align: left; 
+      margin-top: 15px; 
+      margin-bottom: 8px; 
+      color: #1e40af; 
+      font-weight: 600; 
+    }
+    
+    .admin-card label { 
+      color: #7c3aed; 
+    }
+    
+    select, input { 
+      width: 100%; 
+      padding: 12px 16px; 
+      margin-bottom: 15px; 
+      border: 2px solid #e0f2fe; 
+      border-radius: 8px; 
+      outline: none; 
+      font-size: 15px; 
+      background: #f8fafc; 
+      box-sizing: border-box; 
+      color: #1e293b; 
+      transition: all 0.3s ease; 
+    }
+    
+    select { 
+      appearance: none; 
+      -webkit-appearance: none; 
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%23004085" d="M6 8L0 2h12z"/></svg>'); 
+      background-repeat: no-repeat; 
+      background-position: right 16px center; 
+      background-size: 12px 8px; 
+      cursor: pointer; 
+    }
+    
+    select:focus, input:focus { 
+      border-color: #3b82f6; 
+      background: white; 
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1); 
+    }
+    
+    .admin-card select:focus, .admin-card input:focus { 
+      border-color: #7c3aed; 
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1); 
+    }
+    
+    button { 
+      width: 100%; 
+      padding: 14px; 
+      margin-top: 10px; 
+      border: none; 
+      border-radius: 8px; 
+      background: #3b82f6; 
+      color: white; 
+      font-size: 16px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: all 0.3s ease; 
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3); 
+    }
+    
+    button:hover { 
+      background: #2563eb; 
+      transform: translateY(-2px); 
+    }
+
+    button.type-button {
+      width: auto;
+      display: block;
+    }
+
+    .admin-card button { 
+      background: #7c3aed; 
+      box-shadow: 0 4px 12px rgba(124,58,237,0.3); 
+    }
+    
+    .admin-card button:hover { 
+      background: #6d28d9; 
+    }
+    
+    .back-button { 
+      background: #94a3b8; 
+      width: auto; 
+      padding: 10px 20px; 
+      margin-top: 20px; 
+      display: inline-block; 
+    }
+    
+    .back-button:hover { 
+      background: #64748b; 
+    }
+    
+    .toggle-link { 
+      margin-top: 15px; 
+      display: block; 
+      font-size: 14px; 
+      color: #3b82f6; 
+      cursor: pointer; 
+      text-decoration: none; 
+      transition: all 0.2s ease; 
+      font-weight: 500; 
+    }
+    
+    .toggle-link:hover { 
+      color: #2563eb; 
+      text-decoration: underline; 
+    }
+    
+    .error { 
+      font-size: 13px; 
+      color: #dc3545; 
+      margin-bottom: 10px; 
+      display: none; 
+      padding: 8px; 
+      background: rgba(220,53,69,0.1); 
+      border-radius: 6px; 
+      border-left: 4px solid #dc3545; 
+    }
+    
+    .info { 
+      font-size: 13px; 
+      color: #28a745; 
+      margin-top: 10px; 
+      display: none; 
+      padding: 8px; 
+      background: rgba(40,167,69,0.1); 
+      border-radius: 6px; 
+      border-left: 4px solid #28a745; 
+    }
+    
+    .divider { 
+      display: flex; 
+      align-items: center; 
+      gap: 15px; 
+      margin: 20px 0; 
+      color: #94a3b8; 
+      font-size: 13px; 
+    }
+    
+    .divider::before, .divider::after { 
+      content: ''; 
+      flex: 1; 
+      height: 1px; 
+      background: #e2e8f0; 
+    }
+    
+    .badge { 
+      display: inline-block; 
+      padding: 4px 12px; 
+      border-radius: 20px; 
+      font-size: 12px; 
+      font-weight: 600; 
+      margin-bottom: 15px; 
+    }
+    
+    .badge-dept { 
+      background: #dbeafe; 
+      color: #1e40af; 
+    }
+    
+    .badge-admin { 
+      background: #ede9fe; 
+      color: #7c3aed; 
+    }
+
+    /* Hidden elements */
+    .hidden { 
+      display: none !important; 
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="left-logo.png" alt="MET Logo">
+    <div class="header-text">
+      <h1>Maharaja Education Trust (R), Mysuru</h1>
+      <h1>Maharaja Institute of Technology, Mysore</h1>
+      <h1>An Autonomous Institution Affiliated to VTU, Belagavi</h1>
+      <h1>Approved by AICTE, New Delhi | Recognized by Government of Karnataka</h1>
+    </div>
+    <img src="right-logo.png" alt="Circle Logo">
+  </div>
+
+  <div class="page-wrap">
+    <!-- User Type Selection Screen -->
+    <div id="userTypeScreen" class="user-type-selector">
+      <h2>Login to Timetable System</h2>
+      <p>Select your role to proceed</p>
+      <div class="type-buttons">
+        <button class="type-button" onclick="selectUserType('department')">
+          <div class="icon">👥</div>
+          <h3>Department</h3>
+          <p>Faculty and Department Coordinators</p>
+        </button>
+        <button class="type-button admin" onclick="selectUserType('admin')">
+          <div class="icon">⚙️</div>
+          <h3>Administrator</h3>
+          <p>Global System Administration</p>
+        </button>
+      </div>
+    </div>
+
+    <!-- Login Forms Container (Hidden Initially) -->
+    <div id="loginContainer" class="cards-row hidden">
+
+      <!-- Department Login -->
+      <div class="container" id="deptLoginSection" style="display:none;">
+        <span class="badge badge-dept">Department Login</span>
+        <form id="deptLoginForm">
+          <h2>Department Login</h2>
+          <label for="dept">Select Department</label>
+          <select id="dept" required>
+            <option value="">-- Select Department --</option>
+            <option value="CSE">Computer Science & Engineering (CSE)</option>
+            <option value="ISE">Information Science & Engineering (ISE)</option>
+            <option value="AIML">Artificial Intelligence & Machine Learning (AIML)</option>
+            <option value="Data Science">Data Science & Engineering</option>
+            <option value="CSBS">Computer Science & Business Systems (CSBS)</option>
+            <option value="IoT">Internet of Things (IoT)</option>
+            <option value="Cyber Security">Cyber Security</option>
+            <option value="EC">Electronics & Communication Engineering (EC)</option>
+            <option value="EEE">Electrical & Electronics Engineering (EEE)</option>
+            <option value="Mechanical">Mechanical Engineering</option>
+            <option value="Civil">Civil Engineering</option>
+            <option value="Aerospace">Aerospace Engineering</option>
+            <option value="Biotechnology">Biotechnology</option>
+            <option value="Chemical">Chemical Engineering</option>
+          </select>
+          <label for="deptPassword">Username</label>
+          <input type="text" id="deptUsername" placeholder="MIT Mysore" required>
+          <label for="deptPassword">Password</label>
+          <input type="password" id="deptPassword" placeholder="Enter Password" required>
+          <div id="deptLoginError" class="error"></div>
+          <button type="submit">Login</button>
+          <button type="button" class="back-button" onclick="goBackToUserType()">Back</button>
+        </form>
+      </div>
+
+      <!-- Admin Login -->
+      <div class="container admin-card" id="adminLoginSection" style="display:none;">
+        <span class="badge badge-admin">Admin Login</span>
+        <form id="adminLoginForm">
+          <h2>Admin Login</h2>
+          <p style="color:#94a3b8; font-size:13px; margin:0 0 15px 0;">Global system administration and configuration</p>
+          <label for="adminUsername">Username</label>
+          <input type="text" id="adminUsername" placeholder="Enter Username" required>
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" placeholder="Enter Password" required>
+          <div id="adminLoginError" class="error"></div>
+          <button type="submit">Login</button>
+          <button type="button" class="back-button" onclick="goBackToUserType()">Back</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://zfzmnimjekmkyefslflf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpmem1uaW1qZWtta3llZnNsZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODkwOTcsImV4cCI6MjA3ODM2NTA5N30.ffXDOtk9ZEPjCLrI4ahK2lHmbzbjzix3Z9zS19c5lTA';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Fixed credentials
+    const VALID_USERNAME = 'MIT Mysore';
+    const VALID_PASSWORD = 'mitm@1234';
+
+    /**
+     * Show user type selection and hide login forms
+     */
+    function goBackToUserType() {
+      document.getElementById('userTypeScreen').classList.remove('hidden');
+      document.getElementById('loginContainer').classList.add('hidden');
+      document.getElementById('deptLoginSection').style.display = 'none';
+      document.getElementById('adminLoginSection').style.display = 'none';
+      document.getElementById('deptLoginForm').reset();
+      document.getElementById('adminLoginForm').reset();
+      document.getElementById('deptLoginError').style.display = 'none';
+      document.getElementById('adminLoginError').style.display = 'none';
+    }
+
+    /**
+     * Handle user type selection
+     */
+    function selectUserType(userType) {
+      console.log('selectUserType called with:', userType);
+      const userTypeScreen = document.getElementById('userTypeScreen');
+      const loginContainer = document.getElementById('loginContainer');
+      const deptSection = document.getElementById('deptLoginSection');
+      const adminSection = document.getElementById('adminLoginSection');
+      
+      console.log('userTypeScreen:', userTypeScreen);
+      console.log('loginContainer:', loginContainer);
+      console.log('deptSection:', deptSection);
+      console.log('adminSection:', adminSection);
+      
+      if (userTypeScreen) {
+        userTypeScreen.classList.add('hidden');
+      }
+      if (loginContainer) {
+        loginContainer.classList.remove('hidden');
+      }
+      
+      if (userType === 'department') {
+        if (deptSection) deptSection.style.display = 'block';
+        if (adminSection) adminSection.style.display = 'none';
+        console.log('Department login section shown');
+      } else if (userType === 'admin') {
+        if (adminSection) adminSection.style.display = 'block';
+        if (deptSection) deptSection.style.display = 'none';
+        console.log('Admin login section shown');
+      }
+    }
+
+    // Add programmatic event listeners to buttons as backup
+    function setupButtonListeners() {
+      console.log('Setting up button listeners...');
+      const deptButton = document.querySelector('button[onclick*="department"]');
+      const adminButton = document.querySelector('button[onclick*="admin"]');
+      
+      if (deptButton) {
+        console.log('Found department button, adding listener');
+        deptButton.addEventListener('click', function(e) {
+          console.log('Department button clicked');
+          e.preventDefault();
+          selectUserType('department');
+        });
+      } else {
+        console.log('Department button not found');
+      }
+      
+      if (adminButton) {
+        console.log('Found admin button, adding listener');
+        adminButton.addEventListener('click', function(e) {
+          console.log('Admin button clicked');
+          e.preventDefault();
+          selectUserType('admin');
+        });
+      } else {
+        console.log('Admin button not found');
+      }
+    }
+
+    // Setup listeners when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupButtonListeners);
+    } else {
+      setupButtonListeners();
+    }
+
+    /**
+     * Handle Department Login
+     */
+    document.getElementById('deptLoginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const department = document.getElementById('dept').value.trim();
+      const username = document.getElementById('deptUsername').value.trim();
+      const password = document.getElementById('deptPassword').value.trim();
+      const errorDiv = document.getElementById('deptLoginError');
+
+      // Validation
+      if (!department) {
+        errorDiv.textContent = 'Please select a department.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // Check fixed credentials
+      if (username !== VALID_USERNAME || password !== VALID_PASSWORD) {
+        errorDiv.textContent = 'Invalid username or password. Use: MIT Mysore / mitm@1234';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // Success - redirect to dashboard
+      errorDiv.style.display = 'none';
+      localStorage.setItem('currentDepartment', department);
+      localStorage.setItem('userType', 'department');
+      localStorage.setItem('username', username);
+      window.location.href = `/page.htm?dept=${encodeURIComponent(department)}`;
+    });
+
+    /**
+     * Handle Admin Login
+     */
+    document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('adminUsername').value.trim();
+      const password = document.getElementById('adminPassword').value.trim();
+      const errorDiv = document.getElementById('adminLoginError');
+
+      // Check fixed credentials
+      if (username !== VALID_USERNAME || password !== VALID_PASSWORD) {
+        errorDiv.textContent = 'Invalid admin credentials. Use: MIT Mysore / mitm@1234';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // Success - redirect to admin dashboard
+      errorDiv.style.display = 'none';
+      sessionStorage.setItem('adminLoggedIn', 'true');
+      sessionStorage.setItem('adminUsername', username);
+      sessionStorage.setItem('userType', 'admin');
+      window.location.href = '/global-admin.htm';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lab Management</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding-top: 90px; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+    .header img { height: 70px; border-radius: 50%; }
+    .header-text { text-align: center; flex: 1; color: white; }
+    .header-text h1 { font-size: 18px; margin: 2px 0; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(30,64,175,0.08); }
+    .card h2 { font-size: 18px; color: #004085; margin-bottom: 15px; }
+    label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: 600; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .btn { padding: 12px 24px; border: none; background: #3b82f6; color: white; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; }
+    .btn:hover { background: #2563eb; }
+    .btn-success { background: #28a745; }
+    .btn-danger { background: #ef4444; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; font-size: 14px; }
+    th { background: #f8f9fa; font-weight: 600; }
+    tr:hover { background: #f8f9fa; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="left-logo.png" alt="Logo">
+    <div class="header-text">
+      <h1>Maharaja Institute of Technology, Mysore</h1>
+      <h1>Lab Room Management</h1>
+    </div>
+    <img src="right-logo.png" alt="Logo">
+  </div>
+
+  <div class="container">
+    <button class="btn btn-success" onclick="window.history.back()" style="margin-bottom:20px;">← Back</button>
+
+    <div class="card">
+      <h2>Add New Lab Room</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+        <div>
+          <label>Room Code:</label>
+          <input type="text" id="roomCode" placeholder="e.g. ISE-LAB-01">
+        </div>
+        <div>
+          <label>Lab Name:</label>
+          <input type="text" id="labName" placeholder="e.g. Database Lab">
+        </div>
+        <div>
+          <label>Capacity:</label>
+          <input type="number" id="capacity" value="30" min="1">
+        </div>
+        <div>
+          <label>Equipment:</label>
+          <input type="text" id="equipment" placeholder="e.g. 30 PCs, Projector">
+        </div>
+      </div>
+      <button class="btn" onclick="addLabRoom()" style="margin-top:15px;">Add Lab Room</button>
+    </div>
+
+    <div class="card">
+      <h2>Lab Rooms for <span id="deptName"></span></h2>
+      <table id="labTable">
+        <thead>
+          <tr>
+            <th>Room Code</th>
+            <th>Lab Name</th>
+            <th>Capacity</th>
+            <th>Equipment</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zfzmnimjekmkyefslflf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpmem1uaW1qZWtta3llZnNsZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODkwOTcsImV4cCI6MjA3ODM2NTA5N30.ffXDOtk9ZEPjCLrI4ahK2lHmbzbjzix3Z9zS19c5lTA';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentDepartment = urlParams.get('dept') || localStorage.getItem('currentDepartment') || 'ISE';
+    
+    document.getElementById('deptName').textContent = currentDepartment;
+
+    async function loadLabRooms() {
+      try {
+        const { data, error } = await supabase.from('lab_rooms').select('*')
+          .eq('department', currentDepartment).order('room_code');
+        if (error) throw error;
+        
+        const tbody = document.querySelector('#labTable tbody');
+        tbody.innerHTML = (data || []).map(lab => `
+          <tr>
+            <td><strong>${lab.room_code}</strong></td>
+            <td>${lab.lab_name}</td>
+            <td>${lab.capacity}</td>
+            <td>${lab.equipment || '-'}</td>
+            <td><span style="color:${lab.is_active ? '#28a745' : '#dc3545'};font-weight:bold;">${lab.is_active ? 'Active' : 'Inactive'}</span></td>
+            <td>
+              <button onclick="deleteLabRoom(${lab.id})" class="btn-danger" style="padding:6px 12px;border:none;border-radius:4px;cursor:pointer;color:white;">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        alert('Error loading labs: ' + error.message);
+      }
+    }
+
+    async function addLabRoom() {
+      const roomCode = document.getElementById('roomCode').value.trim();
+      const labName = document.getElementById('labName').value.trim();
+      const capacity = parseInt(document.getElementById('capacity').value) || 30;
+      const equipment = document.getElementById('equipment').value.trim();
+
+      if (!roomCode || !labName) {
+        alert('Please fill Room Code and Lab Name');
+        return;
+      }
+
+      try {
+        const { error } = await supabase.from('lab_rooms').insert([{
+          department: currentDepartment,
+          room_code: roomCode,
+          lab_name: labName,
+          capacity: capacity,
+          equipment: equipment,
+          is_active: true
+        }]);
+        
+        if (error) throw error;
+        
+        document.getElementById('roomCode').value = '';
+        document.getElementById('labName').value = '';
+        document.getElementById('capacity').value = '30';
+        document.getElementById('equipment').value = '';
+        
+        alert('✓ Lab room added successfully');
+        loadLabRooms();
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function deleteLabRoom(id) {
+      if (!confirm('Delete this lab room?')) return;
+      try {
+        const { error } = await supabase.from('lab_rooms').update({ is_active: false }).eq('id', id);
+        if (error) throw error;
+        alert('✓ Lab room deleted');
+        loadLabRooms();
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    loadLabRooms();
+  </script>
+</body>
+</html>

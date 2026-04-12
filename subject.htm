@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Subject Management</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding-top: 90px; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+    .header img { height: 70px; border-radius: 50%; }
+    .header-text { text-align: center; flex: 1; color: white; }
+    .header-text h1 { font-size: 18px; margin: 2px 0; }
+    main { display: flex; max-width: 1400px; margin: 0 auto; gap: 20px; padding: 20px; }
+    aside { width: 350px; background: white; padding: 20px; border-radius: 12px; height: fit-content; }
+    section { flex: 1; background: white; padding: 20px; border-radius: 12px; }
+    label { display: block; font-size: 13px; margin-top: 10px; margin-bottom: 5px; font-weight: 600; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    button { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 8px; background: #3b82f6; color: white; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #2563eb; }
+    .btn-danger { background: #ef4444; }
+    .btn-danger:hover { background: #dc2626; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; font-size: 14px; }
+    th { background: #f8f9fa; font-weight: 600; }
+    tr:hover { background: #f8f9fa; }
+    .checkbox-group { background: #eff6ff; padding: 12px; border-radius: 8px; margin: 10px 0; border: 2px solid #dbeafe; }
+    .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+    .checkbox-label input { width: auto; }
+    #teachingDeptWrapper { display: none; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="left-logo.png" alt="Logo">
+    <div class="header-text">
+      <h1>Maharaja Institute of Technology, Mysore</h1>
+      <h1>Subject Management</h1>
+    </div>
+    <img src="right-logo.png" alt="Logo">
+  </div>
+
+  <main>
+    <aside>
+      <button onclick="window.location.href='page.htm?dept='+currentDepartment" style="background:#28a745;">← Back</button>
+      
+      <label>Academic Year:</label>
+      <input type="text" id="academicYearInput" placeholder="e.g. 2024-25">
+
+      <label>Year:</label>
+      <select id="yearSelect">
+        <option value="">--Select--</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+
+      <label>Semester:</label>
+      <select id="semesterSelect">
+        <option value="">--Select--</option>
+      </select>
+
+      <label>Subject Code:</label>
+      <input type="text" id="subCodeInput" placeholder="e.g. IS501" style="text-transform: uppercase;">
+
+      <label>Subject Name:</label>
+      <input type="text" id="subjectInput" placeholder="Enter subject">
+
+      <label>Credits:</label>
+      <input type="number" id="creditsInput" min="1" max="6" value="1">
+
+      <label>Type:</label>
+      <select id="typeInput">
+        <option value="theory">Theory</option>
+        <option value="lab">Lab (2 consecutive hours)</option>
+        <option value="free">Free</option>
+      </select>
+
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="isCrossDept"> Cross-Department Subject
+        </label>
+        <div id="teachingDeptWrapper">
+          <label style="color:#f97316;font-weight:bold;">Teaching Department:</label>
+          <select id="teachingDeptSelect" style="border-color:#f97316;">
+            <option value="">--Select--</option>
+            <option value="CSE">CSE</option>
+            <option value="ISE">ISE</option>
+            <option value="AIML">AIML</option>
+            <option value="ECE">ECE</option>
+            <option value="EEE">EEE</option>
+            <option value="MECH">Mechanical</option>
+            <option value="CIVIL">Civil</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="isOpenElective"> Open Elective (Same slot for all depts)
+        </label>
+        <div style="font-size:11px;color:#7c3aed;margin-top:5px;font-style:italic;">
+          Admin will lock the time slot for this OE
+        </div>
+      </div>
+
+      <label>Weekly Hours:</label>
+      <input type="number" id="weeklyHoursInput" min="1" max="10" value="3">
+
+      <button id="addBtn">Add Subject</button>
+      <button id="saveBtn" style="background:#28a745;">💾 Save to Database</button>
+      <button id="clearBtn" class="btn-danger">🗑️ Clear All</button>
+    </aside>
+    
+    <section>
+      <h2 style="margin-bottom:15px;">Subjects List</h2>
+      <table id="subjectsTable">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Subject</th>
+            <th>Credits</th>
+            <th>Type</th>
+            <th>Weekly Hours</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://zfzmnimjekmkyefslflf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpmem1uaW1qZWtta3llZnNsZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODkwOTcsImV4cCI6MjA3ODM2NTA5N30.ffXDOtk9ZEPjCLrI4ahK2lHmbzbjzix3Z9zS19c5lTA';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentDepartment = urlParams.get('dept') || localStorage.getItem('currentDepartment') || 'ISE';
+    let currentSubjects = [];
+
+    document.getElementById('isCrossDept').onchange = () => {
+      document.getElementById('teachingDeptWrapper').style.display = 
+        document.getElementById('isCrossDept').checked ? 'block' : 'none';
+    };
+
+    document.getElementById('yearSelect').onchange = function() {
+      const year = this.value;
+      const semSelect = document.getElementById('semesterSelect');
+      semSelect.innerHTML = '<option value="">--Select--</option>';
+      if (year) {
+        const sems = {'1':['1','2'],'2':['3','4'],'3':['5','6'],'4':['7','8']}[year];
+        sems.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = 'Semester ' + s;
+          semSelect.appendChild(opt);
+        });
+      }
+    };
+
+    document.getElementById('semesterSelect').onchange = loadSubjects;
+
+    async function loadSubjects() {
+      const ay = document.getElementById('academicYearInput').value.trim();
+      const year = document.getElementById('yearSelect').value;
+      const sem = document.getElementById('semesterSelect').value;
+      if (!ay || !year || !sem) return;
+      
+      try {
+        const { data, error } = await supabase.from('subjects').select('*')
+          .eq('department', currentDepartment).eq('academic_year', ay)
+          .eq('year', parseInt(year)).eq('semester', parseInt(sem));
+        if (error) throw error;
+        currentSubjects = data || [];
+        renderTable();
+      } catch (err) {
+        console.error('Error loading subjects:', err);
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.querySelector('#subjectsTable tbody');
+      tbody.innerHTML = currentSubjects.map((sub, i) => `
+        <tr>
+          <td><strong>${sub.sub_code || ''}</strong></td>
+          <td>${sub.name}${sub.is_open_elective ? ' <span style="color:#7c3aed;font-weight:bold;">(OE)</span>' : ''}</td>
+          <td>${sub.credits}</td>
+          <td>${sub.type.toUpperCase()}</td>
+          <td>${sub.weekly_hours}h</td>
+          <td>
+            <button onclick="deleteSubject(${i})" style="padding:6px 12px;background:#ef4444;color:white;border:none;border-radius:4px;cursor:pointer;">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('addBtn').onclick = async () => {
+      const ay = document.getElementById('academicYearInput').value.trim();
+      const year = document.getElementById('yearSelect').value;
+      const sem = document.getElementById('semesterSelect').value;
+      const subCode = document.getElementById('subCodeInput').value.trim().toUpperCase();
+      const subjectName = document.getElementById('subjectInput').value.trim();
+      const credits = parseInt(document.getElementById('creditsInput').value) || 1;
+      const type = document.getElementById('typeInput').value;
+      const weeklyHours = parseInt(document.getElementById('weeklyHoursInput').value) || 3;
+      const isCrossDept = document.getElementById('isCrossDept').checked;
+      const teachingDept = isCrossDept ? document.getElementById('teachingDeptSelect').value : null;
+      const isOpenElective = document.getElementById('isOpenElective').checked;
+
+      if (!ay || !year || !sem) { alert('Select Academic Year, Year, Semester'); return; }
+      if (!subjectName) { alert('Enter subject name'); return; }
+      if (isCrossDept && !teachingDept) { alert('Select teaching department'); return; }
+
+      try {
+        const { error } = await supabase.from('subjects').insert([{
+          department: currentDepartment,
+          academic_year: ay,
+          year: parseInt(year),
+          semester: parseInt(sem),
+          sub_code: subCode,
+          name: subjectName,
+          credits: credits,
+          type: type,
+          weekly_hours: weeklyHours,
+          is_cross_dept: isCrossDept,
+          teaching_dept: teachingDept,
+          is_open_elective: isOpenElective
+        }]);
+        
+        if (error) throw error;
+        
+        document.getElementById('subCodeInput').value = '';
+        document.getElementById('subjectInput').value = '';
+        document.getElementById('creditsInput').value = '1';
+        document.getElementById('typeInput').value = 'theory';
+        document.getElementById('weeklyHoursInput').value = '3';
+        document.getElementById('isCrossDept').checked = false;
+        document.getElementById('isOpenElective').checked = false;
+        document.getElementById('teachingDeptWrapper').style.display = 'none';
+        
+        alert('✓ Subject added successfully');
+        loadSubjects();
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    };
+
+    async function deleteSubject(index) {
+      if (!confirm('Delete this subject?')) return;
+      const subject = currentSubjects[index];
+      try {
+        const { error } = await supabase.from('subjects').delete()
+          .eq('id', subject.id);
+        if (error) throw error;
+        alert('✓ Subject deleted');
+        loadSubjects();
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    document.getElementById('saveBtn').onclick = async () => {
+      alert('✓ All changes are auto-saved to database');
+    };
+
+    document.getElementById('clearBtn').onclick = async () => {
+      if (!confirm(`Clear all subjects for ${currentDepartment}?`)) return;
+      try {
+        const { error } = await supabase.from('subjects').delete()
+          .eq('department', currentDepartment);
+        if (error) throw error;
+        currentSubjects = [];
+        renderTable();
+        alert('✓ All subjects cleared');
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    };
+  </script>
+</body>
+</html>

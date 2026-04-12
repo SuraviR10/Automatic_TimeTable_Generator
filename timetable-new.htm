@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Timetable Generator</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding-top: 90px; }
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+        .header img { height: 70px; border-radius: 50%; }
+        .header-text { text-align: center; flex: 1; color: white; }
+        .header-text h1 { font-size: 18px; margin: 2px 0; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(30,64,175,0.08); }
+        .card h2 { font-size: 18px; color: #004085; margin-bottom: 15px; }
+        label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: 600; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .btn { padding: 12px 24px; border: none; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; }
+        .btn:hover { opacity: 0.9; }
+        .btn-success { background: linear-gradient(135deg, #28a745 0%, #16a34a 100%); }
+        .hidden { display: none; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 10000; color: white; }
+        .loading-spinner { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .subject-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #17a2b8; }
+        .section-row { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+    <div style="text-align: center;">
+        <div class="loading-spinner"></div>
+        <div id="loadingText" style="margin-top: 20px; font-size: 18px; font-weight: bold;">Loading...</div>
+    </div>
+</div>
+
+<div class="header">
+    <img src="left-logo.png" alt="Logo">
+    <div class="header-text">
+        <h1>Maharaja Institute of Technology, Mysore</h1>
+        <h1>Timetable Generator</h1>
+    </div>
+    <img src="right-logo.png" alt="Logo">
+</div>
+
+<div class="container">
+    <div class="card">
+        <h2>Quick Setup</h2>
+        <label>Academic Year</label>
+        <input id="academicYear" type="text" placeholder="e.g. 2024-25" value="2024-25" />
+        <label>Year</label>
+        <select id="yearSelect">
+            <option value="">--Select--</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+        <label>Semester</label>
+        <select id="semesterSelect">
+            <option value="">--Select--</option>
+        </select>
+        <label>Number of Sections</label>
+        <input id="numSections" type="number" min="1" max="10" value="1" />
+    </div>
+
+    <div class="card">
+        <h2>Schedule Config (Loaded from Admin Settings)</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+            <div><label>Periods per Day</label><input id="periodsPerDay" type="number" value="6" /></div>
+            <div><label>Start Time</label><input id="startTime" type="time" value="09:00" /></div>
+            <div><label>End Time</label><input id="endTime" type="time" value="16:00" /></div>
+            <div><label>Tea Break After Period</label><input id="teaBreakAfter" type="number" value="2" /></div>
+            <div><label>Lunch Break After Period</label><input id="lunchBreakAfter" type="number" value="4" /></div>
+        </div>
+        <div style="margin-top:10px;padding:10px;background:#e3f2fd;border-radius:6px;font-size:12px;">
+            <strong>Note:</strong> Settings loaded from admin dashboard. Labs scheduled in 2-hour blocks avoiding breaks.
+        </div>
+    </div>
+
+    <button class="btn" onclick="loadSubjects()" style="max-width:300px;margin:0 auto;display:block;">Load Subjects</button>
+
+    <div id="subjectsDisplay" class="hidden">
+        <h2 style="text-align:center;color:#004085;margin:20px 0;">Loaded Subjects</h2>
+        <div id="subjectsList"></div>
+        <button class="btn" onclick="showFacultyAssignment()" style="max-width:300px;margin:20px auto;display:block;">Assign Faculty</button>
+    </div>
+
+    <div id="facultyAssignment" class="hidden">
+        <h2 style="text-align:center;color:#004085;margin:20px 0;">Faculty Assignment</h2>
+        <div id="subjectCards"></div>
+        <button class="btn btn-success" onclick="generateTimetableNow()" style="margin-top:20px;max-width:300px;display:block;margin-left:auto;margin-right:auto;">Generate Timetable</button>
+    </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://zfzmnimjekmkyefslflf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpmem1uaW1qZWtta3llZnNsZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODkwOTcsImV4cCI6MjA3ODM2NTA5N30.ffXDOtk9ZEPjCLrI4ahK2lHmbzbjzix3Z9zS19c5lTA';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const urlParams = new URLSearchParams(window.location.search);
+const currentDepartment = urlParams.get('dept') || localStorage.getItem('currentDepartment') || 'ISE';
+let loadedSubjects = [];
+let allFacultyList = [];
+
+// Load settings from DB
+async function loadSettings() {
+    try {
+        const { data } = await supabase.from('global_settings').select('*');
+        if (data) {
+            const settings = {};
+            data.forEach(row => settings[row.setting_key] = row.setting_value);
+            if (settings.periods_per_day) document.getElementById('periodsPerDay').value = settings.periods_per_day;
+            if (settings.start_time) document.getElementById('startTime').value = settings.start_time;
+            if (settings.end_time) document.getElementById('endTime').value = settings.end_time;
+            if (settings.tea_break_after_period) document.getElementById('teaBreakAfter').value = settings.tea_break_after_period;
+            if (settings.lunch_break_after_period) document.getElementById('lunchBreakAfter').value = settings.lunch_break_after_period;
+        }
+    } catch (err) {
+        console.error('Error loading settings:', err);
+    }
+}
+
+document.getElementById('yearSelect').onchange = function() {
+    const year = this.value;
+    const semSelect = document.getElementById('semesterSelect');
+    semSelect.innerHTML = '<option value="">--Select--</option>';
+    if (year) {
+        const sems = {'1':['1','2'],'2':['3','4'],'3':['5','6'],'4':['7','8']}[year];
+        sems.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = 'Semester ' + s;
+            semSelect.appendChild(opt);
+        });
+    }
+};
+
+async function loadSubjects() {
+    const ay = document.getElementById('academicYear').value.trim();
+    const year = document.getElementById('yearSelect').value;
+    const sem = document.getElementById('semesterSelect').value;
+    if (!ay || !year || !sem) { alert('Please fill all fields'); return; }
+    try {
+        const { data, error } = await supabase.from('subjects').select('*')
+            .eq('department', currentDepartment).eq('academic_year', ay)
+            .eq('year', parseInt(year)).eq('semester', parseInt(sem));
+        if (error) throw error;
+        if (!data || data.length === 0) { alert('No subjects found'); return; }
+        loadedSubjects = data;
+        await loadAllFaculty();
+        displaySubjects();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+async function loadAllFaculty() {
+    try {
+        const { data, error } = await supabase.from('faculty').select('*').order('department,name');
+        if (error) throw error;
+        allFacultyList = data || [];
+        return true;
+    } catch (err) {
+        console.error('Error loading faculty:', err);
+        allFacultyList = [];
+        return false;
+    }
+}
+
+function displaySubjects() {
+    const container = document.getElementById('subjectsList');
+    container.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px;">' +
+        loadedSubjects.map(s => `
+            <div style="padding:15px;background:white;border-radius:8px;border-left:4px solid #17a2b8;">
+                <strong>${s.sub_code || s.name}</strong><br>
+                <span style="font-size:12px;color:#666;">${s.type.toUpperCase()} | ${s.weekly_hours}h/week | ${s.credits} Credits</span>
+            </div>
+        `).join('') + '</div>';
+    document.getElementById('subjectsDisplay').classList.remove('hidden');
+    document.getElementById('facultyAssignment').classList.add('hidden');
+}
+
+async function showFacultyAssignment() {
+    const numSections = parseInt(document.getElementById('numSections').value) || 1;
+    const container = document.getElementById('subjectCards');
+    let html = '';
+    
+    for (let subjectIdx = 0; subjectIdx < loadedSubjects.length; subjectIdx++) {
+        const subject = loadedSubjects[subjectIdx];
+        let facultyForSubject = [];
+        
+        if (subject.type.toLowerCase() === 'free') {
+            facultyForSubject = [{id: 'N/A', name: 'N/A - Free Period', initials: 'N/A'}];
+        } else {
+            const isCross = String(subject.is_cross_dept).toLowerCase() === 'true' || String(subject.is_cross_dept) === '1';
+            if (isCross && subject.teaching_dept) {
+                const teachNorm = subject.teaching_dept.trim().toUpperCase();
+                facultyForSubject = allFacultyList.filter(f => f.department.trim().toUpperCase().startsWith(teachNorm));
+            } else {
+                const currentNorm = currentDepartment.trim().toUpperCase();
+                facultyForSubject = allFacultyList.filter(f => f.department.trim().toUpperCase().startsWith(currentNorm));
+            }
+        }
+        
+        let sectionsHTML = '';
+        for (let i = 1; i <= numSections; i++) {
+            const sectionLetter = String.fromCharCode(64 + i);
+            sectionsHTML += `
+                <div class="section-row">
+                    <label>Sec ${sectionLetter}</label>
+                    <select id="faculty_s${i}_sub${subjectIdx}" required>
+                        <option value="">--Select Faculty--</option>
+                        ${facultyForSubject.map(f => `<option value="${f.id}">${f.name} - ${f.initials}</option>`).join('')}
+                    </select>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div class="subject-card">
+                <h3>${subject.sub_code || subject.name}</h3>
+                <div style="font-size:12px;color:#666;margin-bottom:10px;">${subject.type.toUpperCase()} | ${subject.weekly_hours}h/week</div>
+                ${sectionsHTML}
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    document.getElementById('subjectsDisplay').classList.add('hidden');
+    document.getElementById('facultyAssignment').classList.remove('hidden');
+}
+
+async function generateTimetableNow() {
+    const ay = document.getElementById('academicYear').value.trim();
+    const year = document.getElementById('yearSelect').value;
+    const sem = document.getElementById('semesterSelect').value;
+    const numSections = parseInt(document.getElementById('numSections').value) || 1;
+    
+    if (!ay || !year || !sem) { alert('Please complete all fields'); return; }
+    
+    // Validate faculty assignments
+    for (let i = 1; i <= numSections; i++) {
+        for (let idx = 0; idx < loadedSubjects.length; idx++) {
+            const facultyId = document.getElementById(`faculty_s${i}_sub${idx}`).value;
+            if (!facultyId) {
+                alert(`Please assign faculty for ${loadedSubjects[idx].name} in Section ${i}`);
+                return;
+            }
+        }
+    }
+    
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    document.getElementById('loadingText').textContent = 'Generating Timetable...';
+    
+    try {
+        const gaInput = {
+            department: currentDepartment,
+            semester: parseInt(sem),
+            year: parseInt(year),
+            academic_year: ay,
+            sections: []
+        };
+        
+        for (let i = 1; i <= numSections; i++) {
+            const sectionLetter = String.fromCharCode(64 + i);
+            const sectionData = { name: sectionLetter, assignments: [] };
+            
+            for (let idx = 0; idx < loadedSubjects.length; idx++) {
+                const subject = loadedSubjects[idx];
+                const facultyId = document.getElementById(`faculty_s${i}_sub${idx}`).value;
+                let faculty = allFacultyList.find(f => f.id == facultyId);
+                
+                if (subject.type.toLowerCase() === 'free' || facultyId === 'N/A') {
+                    faculty = {id: 'N/A', name: 'N/A', initials: 'N/A'};
+                }
+                
+                if (!faculty) {
+                    const { data: foundFaculty } = await supabase.from('faculty').select('*').eq('id', facultyId).single();
+                    faculty = foundFaculty;
+                }
+                
+                if (!faculty) {
+                    alert(`Faculty not found for ${subject.name} in Section ${i}`);
+                    return;
+                }
+                
+                sectionData.assignments.push({
+                    subject_code: subject.sub_code || subject.name,
+                    subject_name: subject.name,
+                    faculty_name: faculty.name,
+                    weekly_hours: subject.weekly_hours,
+                    type: subject.type,
+                    is_cross_dept: subject.is_cross_dept || false,
+                    teaching_dept: subject.teaching_dept
+                });
+            }
+            
+            gaInput.sections.push(sectionData);
+        }
+        
+        const response = await fetch('http://localhost:5000/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(gaInput)
+        });
+        
+        const result = await response.json();
+        
+        const failedSections = [];
+        const successfulSections = [];
+        
+        Object.keys(result).forEach(sectionName => {
+            if (result[sectionName].valid) {
+                successfulSections.push(sectionName);
+            } else {
+                failedSections.push(sectionName);
+            }
+        });
+        
+        if (failedSections.length > 0) {
+            throw new Error(`Failed for sections: ${failedSections.join(', ')}. ${result[failedSections[0]]?.error || 'Unknown error'}`);
+        }
+        
+        if (successfulSections.length === 0) {
+            throw new Error('No timetables generated successfully');
+        }
+        
+        const timetableData = {
+            department: currentDepartment,
+            semester: sem,
+            year: year,
+            academicYear: ay,
+            sections: gaInput.sections,
+            subjects: loadedSubjects,
+            faculty: allFacultyList,
+            generatedResults: result
+        };
+        
+        localStorage.setItem('timetableData', JSON.stringify(timetableData));
+        alert(`✓ Timetable generated successfully for ${successfulSections.length} section(s)!`);
+        window.location.href = 'enhanced.htm';
+        
+    } catch (error) {
+        console.error('Generation error:', error);
+        let friendlyError = error.message;
+        if (error.message.includes('Failed to fetch')) {
+            friendlyError = `Cannot connect to server.\n\nTo fix:\n1. Open Command Prompt\n2. Navigate to project folder\n3. Run: py unified_server.py\n4. Wait for "Server running"\n5. Try again`;
+        }
+        alert(friendlyError);
+    } finally {
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+}
+
+loadSettings();
+</script>
+</body>
+</html>
