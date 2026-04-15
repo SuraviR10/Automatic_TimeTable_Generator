@@ -407,7 +407,7 @@
             <option value="Biotechnology">Biotechnology</option>
             <option value="Chemical">Chemical Engineering</option>
           </select>
-          <label for="deptPassword">Username</label>
+          <label for="deptUsername">Username</label>
           <input type="text" id="deptUsername" placeholder="MIT Mysore" required>
           <label for="deptPassword">Password</label>
           <input type="password" id="deptPassword" placeholder="Enter Password" required>
@@ -438,13 +438,21 @@
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://zfzmnimjekmkyefslflf.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpmem1uaW1qZWtta3llZnNsZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODkwOTcsImV4cCI6MjA3ODM2NTA5N30.ffXDOtk9ZEPjCLrI4ahK2lHmbzbjzix3Z9zS19c5lTA';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     // Fixed credentials
     const VALID_USERNAME = 'MIT Mysore';
     const VALID_PASSWORD = 'mitm@1234';
+
+    // Supabase client (optional)
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        const SUPABASE_URL = 'https://zfzmnimjekmkyefslflf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpmem1uaW1qZWtta3llZnNsZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODkwOTcsImV4cCI6MjA3ODM2NTA5N30.ffXDOtk9ZEPjCLrI4ahK2lHmbzbjzix3Z9zS19c5lTA';
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (e) {
+      console.warn('Supabase not available:', e);
+    }
 
     /**
      * Show user type selection and hide login forms
@@ -465,68 +473,16 @@
      */
     function selectUserType(userType) {
       console.log('selectUserType called with:', userType);
-      const userTypeScreen = document.getElementById('userTypeScreen');
-      const loginContainer = document.getElementById('loginContainer');
-      const deptSection = document.getElementById('deptLoginSection');
-      const adminSection = document.getElementById('adminLoginSection');
-      
-      console.log('userTypeScreen:', userTypeScreen);
-      console.log('loginContainer:', loginContainer);
-      console.log('deptSection:', deptSection);
-      console.log('adminSection:', adminSection);
-      
-      if (userTypeScreen) {
-        userTypeScreen.classList.add('hidden');
-      }
-      if (loginContainer) {
-        loginContainer.classList.remove('hidden');
-      }
-      
+      document.getElementById('userTypeScreen').classList.add('hidden');
+      document.getElementById('loginContainer').classList.remove('hidden');
+
       if (userType === 'department') {
-        if (deptSection) deptSection.style.display = 'block';
-        if (adminSection) adminSection.style.display = 'none';
-        console.log('Department login section shown');
+        document.getElementById('deptLoginSection').style.display = 'block';
+        document.getElementById('adminLoginSection').style.display = 'none';
       } else if (userType === 'admin') {
-        if (adminSection) adminSection.style.display = 'block';
-        if (deptSection) deptSection.style.display = 'none';
-        console.log('Admin login section shown');
+        document.getElementById('adminLoginSection').style.display = 'block';
+        document.getElementById('deptLoginSection').style.display = 'none';
       }
-    }
-
-    // Add programmatic event listeners to buttons as backup
-    function setupButtonListeners() {
-      console.log('Setting up button listeners...');
-      const deptButton = document.querySelector('button[onclick*="department"]');
-      const adminButton = document.querySelector('button[onclick*="admin"]');
-      
-      if (deptButton) {
-        console.log('Found department button, adding listener');
-        deptButton.addEventListener('click', function(e) {
-          console.log('Department button clicked');
-          e.preventDefault();
-          selectUserType('department');
-        });
-      } else {
-        console.log('Department button not found');
-      }
-      
-      if (adminButton) {
-        console.log('Found admin button, adding listener');
-        adminButton.addEventListener('click', function(e) {
-          console.log('Admin button clicked');
-          e.preventDefault();
-          selectUserType('admin');
-        });
-      } else {
-        console.log('Admin button not found');
-      }
-    }
-
-    // Setup listeners when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupButtonListeners);
-    } else {
-      setupButtonListeners();
     }
 
     /**
@@ -559,7 +515,7 @@
       localStorage.setItem('currentDepartment', department);
       localStorage.setItem('userType', 'department');
       localStorage.setItem('username', username);
-      window.location.href = `/page.htm?dept=${encodeURIComponent(department)}`;
+      window.location.href = `page.htm?dept=${encodeURIComponent(department)}`;
     });
 
     /**
@@ -584,7 +540,7 @@
       sessionStorage.setItem('adminLoggedIn', 'true');
       sessionStorage.setItem('adminUsername', username);
       sessionStorage.setItem('userType', 'admin');
-      window.location.href = '/global-admin.htm';
+      window.location.href = 'global-admin.htm';
     });
   </script>
 </body>

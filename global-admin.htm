@@ -151,7 +151,7 @@
         // Auth gate — redirect to index if not logged in
         (function checkAuth() {
             if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
-                window.location.href = '/index.htm';
+                window.location.href = 'index.htm';
             }
             const username = sessionStorage.getItem('adminUsername') || 'Admin';
             document.getElementById('adminBadge').textContent = username;
@@ -160,7 +160,7 @@
         function adminLogout() {
             sessionStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminUsername');
-            window.location.href = '/index.htm';
+            window.location.href = 'index.htm';
         }
 
         function showAlert(message, type) {

@@ -656,7 +656,7 @@
         }
 
         function goBack() {
-            window.location.href = '/timetable-new.htm';
+            window.location.href = 'timetable-new.htm';
         }
 
         async function exportPDF() {
@@ -1207,7 +1207,7 @@
                 
                 // Try to call the backend finalize endpoint with proper data
                 try {
-                    const response = await fetch('http://127.0.0.1:5000/finalize_timetable', {
+                    const response = await fetch('/finalize_timetable', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

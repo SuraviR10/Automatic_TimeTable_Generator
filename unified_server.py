@@ -4,6 +4,14 @@ import random
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from typing import List, Dict, Any, Optional, Tuple, Set
+import httpx
+
+# Patch httpx.Client to ignore proxy
+original_init = httpx.Client.__init__
+def patched_init(self, *args, **kwargs):
+    kwargs.pop('proxy', None)
+    return original_init(self, *args, **kwargs)
+httpx.Client.__init__ = patched_init
 
 try:
     from supabase._sync.client import create_client
@@ -104,14 +112,23 @@ class UnifiedTimetableEngine:
     def generate_timetable_with_retry(self, department: str, section: str, sessions: List[Dict], 
                                      academic_year: str, year: int, semester: int, max_retries: int = 5) -> Dict:
         """Generate timetable with retry logic"""
+        # Snapshot current global occupancy before starting this section
+        snapshot_master = set(self.master_occupancy)
+        snapshot_lab = set(self.lab_room_occupancy)
+        
         result = {'valid': False, 'error': 'No attempts made'}
         for attempt in range(max_retries):
+            # Restore to snapshot state for a fresh attempt for this section
+            self.master_occupancy = set(snapshot_master)
+            self.lab_room_occupancy = set(snapshot_lab)
+            
             result = self.generate_timetable(department, section, sessions, academic_year, year, semester)
             if result['valid']:
                 return result
-            # Reset occupancy for retry
-            self.master_occupancy.clear()
-            self.lab_room_occupancy.clear()
+        
+        # Restore original state if all retries for this section fail
+        self.master_occupancy = set(snapshot_master)
+        self.lab_room_occupancy = set(snapshot_lab)
         return {'valid': False, 'error': f'Failed after {max_retries} attempts', 'last_error': result.get('error')}
     
     def generate_timetable(self, department: str, section: str, sessions: List[Dict], 
@@ -454,6 +471,7 @@ def delete_lab_room():
 @app.route('/generate', methods=['POST'])
 def generate_timetable():
     try:
+        print("Generating timetable request received...")
         payload = request.get_json()
         if not payload:
             return jsonify({'error': 'JSON required'}), 400
