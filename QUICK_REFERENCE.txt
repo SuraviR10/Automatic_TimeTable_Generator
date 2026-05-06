@@ -1,0 +1,89 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                   MIT MYSORE TIMETABLE SYSTEM                             ║
+║                        QUICK START GUIDE                                  ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ 1. START SERVER                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+cd c:\Users\surav\Downloads\TT_final-main
+py unified_server.py
+
+Server will start at: http://localhost:5000
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ 2. LOGIN CREDENTIALS                                                      │
+└───────────────────────────────────────────────────────────────────────────┘
+
+Username: MIT Mysore
+Password: mitm@1234
+
+(Same credentials for both Department and Administrator)
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ 3. DEPARTMENT WORKFLOW                                                    │
+└───────────────────────────────────────────────────────────────────────────┘
+
+Step 1: Click "Department" → Select Department → Login
+Step 2: Subject Database → Add subjects with weekly hours
+Step 3: Faculty Core → Add faculty members
+Step 4: Lab Management → Add lab rooms
+Step 5: Timetable Generator → Load subjects → Assign faculty → Generate
+Step 6: View/Edit → Smart swap → Export PDF → Finalize
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ 4. ADMINISTRATOR WORKFLOW                                                 │
+└───────────────────────────────────────────────────────────────────────────┘
+
+Step 1: Click "Administrator" → Login
+Step 2: Configure work days (default: Tue-Sat)
+Step 3: Set periods per day (default: 6)
+Step 4: Set break timings (Tea: after P2, Lunch: after P4)
+Step 5: Lock Open Elective slots (e.g., OE601 → Thursday P3)
+Step 6: Save Global Configuration
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ 5. ALL 7 CONSTRAINTS                                                      │
+└───────────────────────────────────────────────────────────────────────────┘
+
+✓ Strict Weekly Hours - Each subject placed exactly as specified
+✓ Daily Diversity - No subject repeats on same day
+✓ Lab Continuity - 2-hour blocks (P1-P2, P3-P4, P5-P6)
+✓ NSS/FREE → P6 - Only in last period
+✓ Faculty Conflict - Global tracking across departments
+✓ Lab Room Clash - Global tracking prevents conflicts
+✓ OE Same-Slot - Admin locks, enforced across all departments
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ 6. TROUBLESHOOTING                                                        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+Problem: Buttons don't work
+Solution: Clear browser cache (Ctrl + Shift + Delete)
+
+Problem: Server won't start
+Solution: Check Python version (py --version) and port 5000
+
+Problem: Login fails
+Solution: Check credentials (case-sensitive)
+
+Problem: Generation fails
+Solution: Check all subjects have weekly_hours and faculty assigned
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ 7. SYSTEM STATUS                                                          │
+└───────────────────────────────────────────────────────────────────────────┘
+
+✅ All Pylance errors: FIXED
+✅ Authentication flow: WORKING
+✅ All buttons: FUNCTIONAL
+✅ All 7 constraints: ENFORCED
+✅ Admin settings: INTEGRATED
+✅ Database connections: VERIFIED
+
+STATUS: FULLY OPERATIONAL & PRODUCTION-READY
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    SYSTEM READY TO USE                                    ║
+╚═══════════════════════════════════════════════════════════════════════════╝

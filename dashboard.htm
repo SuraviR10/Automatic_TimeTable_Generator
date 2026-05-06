@@ -465,19 +465,19 @@
                 </div>
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <a href="/timetable-new.htm" class="btn">
+                <a href="#" class="btn" onclick="window.location.href='timetable-new.htm?dept=' + encodeURIComponent(currentDepartment); return false;">
                     <span>➕</span>
                     Generate New Timetable
                 </a>
-                <a href="/subject.htm" class="btn">
+                <a href="#" class="btn" onclick="window.location.href='subject.htm?dept=' + encodeURIComponent(currentDepartment); return false;">
                     <span>📚</span>
                     Manage Subjects
                 </a>
-                <a href="/faculty.htm" class="btn">
+                <a href="#" class="btn" onclick="window.location.href='faculty.htm?dept=' + encodeURIComponent(currentDepartment); return false;">
                     <span>👨‍🏫</span>
                     Manage Faculty
                 </a>
-                <a href="/vault.htm" class="btn">
+                <a href="#" class="btn" onclick="window.location.href='vault.htm?dept=' + encodeURIComponent(currentDepartment); return false;">
                     <span>🗂️</span>
                     View Vault
                 </a>
@@ -575,7 +575,7 @@
                             <div style="font-size: 48px; margin-bottom: 15px;">📅</div>
                             <h3>No Timetables Found</h3>
                             <p>Generate your first timetable to get started!</p>
-                            <a href="/timetable-new.htm?dept=${currentDepartment}" class="btn" style="margin-top: 15px;">
+                            <a href="timetable-new.htm?dept=${currentDepartment}" class="btn" style="margin-top: 15px;">
                                 <span>➕</span>
                                 Create Timetable
                             </a>
@@ -622,12 +622,12 @@
                                 </div>
                             </div>
                             <div style="display: flex; gap: 8px; margin-top: 15px;">
-                                <a href="/enhanced.htm?section=${group.section}&year=${group.year}&semester=${group.semester}" 
+                                <a href="enhanced.htm?section=${group.section}&year=${group.year}&semester=${group.semester}&dept=${currentDepartment}" 
                                    class="btn btn-sm">
                                     <span>👁️</span>
                                     View
                                 </a>
-                                <a href="/faculty-timetable.htm?section=${group.section}" 
+                                <a href="faculty-timetable.htm?section=${group.section}&dept=${currentDepartment}" 
                                    class="btn btn-sm" style="background: #059669;">
                                     <span>👤</span>
                                     Faculty View

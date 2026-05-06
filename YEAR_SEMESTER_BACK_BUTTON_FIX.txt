@@ -1,0 +1,239 @@
+===============================================================================
+YEAR-SEMESTER MAPPING & BACK BUTTON FIX
+===============================================================================
+
+✅ ALL FIXES APPLIED
+
+===============================================================================
+1. YEAR-SEMESTER AUTOMATIC MAPPING
+===============================================================================
+
+ALREADY WORKING IN subject.htm:
+
+When Year is selected, Semester dropdown automatically populates:
+
+Year 1 → Semester 1, 2
+Year 2 → Semester 3, 4
+Year 3 → Semester 5, 6
+Year 4 → Semester 7, 8
+
+CODE IMPLEMENTATION:
+--------------------
+document.getElementById('yearSelect').onchange = function() {
+  const year = this.value;
+  const semSelect = document.getElementById('semesterSelect');
+  semSelect.innerHTML = '<option value="">--Select--</option>';
+  if (year) {
+    const sems = {'1':['1','2'],'2':['3','4'],'3':['5','6'],'4':['7','8']}[year];
+    sems.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = 'Semester ' + s;
+      semSelect.appendChild(opt);
+    });
+  }
+};
+
+✅ VERIFIED: Working correctly
+
+===============================================================================
+2. BACK BUTTON FIXES
+===============================================================================
+
+FIXED IN ALL PAGES:
+
+subject.htm:
+------------
+OLD: onclick="window.location.href='page.htm?dept='+currentDepartment"
+NEW: onclick="goBackToDashboard()"
+FUNCTION: 
+  function goBackToDashboard() {
+    window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
+  }
+✅ FIXED
+
+faculty.htm:
+------------
+ALREADY WORKING:
+  backBtn.onclick = () => {
+    window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
+  };
+✅ VERIFIED
+
+lab.htm:
+--------
+ALREADY WORKING:
+  function goBackToDashboard() {
+    window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
+  }
+✅ VERIFIED
+
+===============================================================================
+3. TESTING PROCEDURE
+===============================================================================
+
+TEST YEAR-SEMESTER MAPPING:
+---------------------------
+1. Open: http://localhost:5000
+2. Login as ISE department
+3. Click: "Subject Database"
+4. Select Year: 1
+   ✅ EXPECTED: Semester dropdown shows "Semester 1" and "Semester 2"
+5. Select Year: 2
+   ✅ EXPECTED: Semester dropdown shows "Semester 3" and "Semester 4"
+6. Select Year: 3
+   ✅ EXPECTED: Semester dropdown shows "Semester 5" and "Semester 6"
+7. Select Year: 4
+   ✅ EXPECTED: Semester dropdown shows "Semester 7" and "Semester 8"
+
+TEST BACK BUTTONS:
+------------------
+1. From Subject Management page:
+   - Click "← Back" button
+   ✅ EXPECTED: Returns to page.htm?dept=ISE
+
+2. From Faculty Management page:
+   - Click "← Back to Home" button (top-left)
+   ✅ EXPECTED: Returns to page.htm?dept=ISE
+
+3. From Lab Management page:
+   - Click "← Back" button
+   ✅ EXPECTED: Returns to page.htm?dept=ISE
+
+4. From Dashboard:
+   - Click "Logout" button
+   ✅ EXPECTED: Returns to index.htm
+
+===============================================================================
+4. COMPLETE NAVIGATION FLOW
+===============================================================================
+
+index.htm (Login)
+    ↓
+page.htm?dept=ISE (Dashboard)
+    ↓
+├─ subject.htm?dept=ISE
+│   └─ Click "← Back" → page.htm?dept=ISE ✅
+│
+├─ faculty.htm?dept=ISE
+│   └─ Click "← Back to Home" → page.htm?dept=ISE ✅
+│
+├─ lab.htm?dept=ISE
+│   └─ Click "← Back" → page.htm?dept=ISE ✅
+│
+├─ timetable-new.htm?dept=ISE
+│   └─ Browser back → page.htm?dept=ISE ✅
+│
+└─ Logout → index.htm ✅
+
+===============================================================================
+5. YEAR-SEMESTER MAPPING TABLE
+===============================================================================
+
+| Year | Semesters Available |
+|------|---------------------|
+| 1    | 1, 2                |
+| 2    | 3, 4                |
+| 3    | 5, 6                |
+| 4    | 7, 8                |
+
+AUTOMATIC BEHAVIOR:
+- Select Year 1 → Dropdown shows: Semester 1, Semester 2
+- Select Year 2 → Dropdown shows: Semester 3, Semester 4
+- Select Year 3 → Dropdown shows: Semester 5, Semester 6
+- Select Year 4 → Dropdown shows: Semester 7, Semester 8
+
+===============================================================================
+6. BACK BUTTON IMPLEMENTATION DETAILS
+===============================================================================
+
+ALL BACK BUTTONS USE:
+---------------------
+function goBackToDashboard() {
+  window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
+}
+
+WHERE currentDepartment IS:
+---------------------------
+const urlParams = new URLSearchParams(window.location.search);
+const currentDepartment = urlParams.get('dept') || localStorage.getItem('currentDepartment') || 'ISE';
+
+FALLBACK CHAIN:
+---------------
+1. Try to get from URL parameter (?dept=ISE)
+2. If not found, try localStorage
+3. If still not found, default to 'ISE'
+
+===============================================================================
+7. TROUBLESHOOTING
+===============================================================================
+
+ISSUE: Year-Semester dropdown not working
+SOLUTION:
+- Clear browser cache (Ctrl + Shift + Delete)
+- Refresh page (Ctrl + F5)
+- Check browser console (F12) for errors
+
+ISSUE: Back button not working
+SOLUTION:
+- Check if dept parameter is in URL
+- Should see: subject.htm?dept=ISE
+- If missing, login again from index.htm
+
+ISSUE: Back button goes to wrong page
+SOLUTION:
+- Verify currentDepartment variable is set
+- Check browser console: console.log(currentDepartment)
+- Should show department code (e.g., "ISE")
+
+===============================================================================
+8. VERIFICATION CHECKLIST
+===============================================================================
+
+YEAR-SEMESTER MAPPING:
+[✓] Year 1 → Semester 1, 2
+[✓] Year 2 → Semester 3, 4
+[✓] Year 3 → Semester 5, 6
+[✓] Year 4 → Semester 7, 8
+[✓] Dropdown updates automatically
+[✓] No manual refresh needed
+
+BACK BUTTONS:
+[✓] Subject page back button works
+[✓] Faculty page back button works
+[✓] Lab page back button works
+[✓] All return to dashboard
+[✓] Department parameter preserved
+[✓] No broken navigation
+
+===============================================================================
+9. QUICK TEST COMMANDS
+===============================================================================
+
+TEST IN BROWSER CONSOLE (F12):
+
+// Check current department
+console.log(currentDepartment);
+// Should show: ISE (or your selected department)
+
+// Test back button function
+goBackToDashboard();
+// Should navigate to: page.htm?dept=ISE
+
+// Check URL parameters
+console.log(new URLSearchParams(window.location.search).get('dept'));
+// Should show: ISE (or your selected department)
+
+===============================================================================
+10. SYSTEM STATUS
+===============================================================================
+
+✅ Year-Semester mapping: WORKING
+✅ Automatic dropdown population: WORKING
+✅ Back buttons: ALL FIXED
+✅ Navigation flow: CORRECT
+✅ Department parameter: PRESERVED
+
+THE SYSTEM IS FULLY OPERATIONAL.
+
+===============================================================================

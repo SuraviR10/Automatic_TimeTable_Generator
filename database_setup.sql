@@ -40,11 +40,9 @@ INSERT INTO departments (code, name) VALUES
 ('ISE', 'Information Science & Engineering'),
 ('AIML', 'Artificial Intelligence & Machine Learning'),
 ('ECE', 'Electronics & Communication Engineering'),
-('EEE', 'Electrical & Electronics Engineering'),
+
 ('MECH', 'Mechanical Engineering'),
 ('CIVIL', 'Civil Engineering'),
-('AERO', 'Aerospace Engineering'),
-('BIOTECH', 'Biotechnology'),
 ('CHEM', 'Chemical Engineering'),
 ('MATH', 'Mathematics'),
 ('PHYSICS', 'Physics'),

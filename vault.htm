@@ -439,7 +439,8 @@
         }
 
         function goBack() {
-            window.history.back();
+            const dept = localStorage.getItem('currentDepartment') || 'ISE';
+            window.location.href = 'page.htm?dept=' + encodeURIComponent(dept);
         }
     </script>
 </body>

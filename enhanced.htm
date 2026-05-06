@@ -12,7 +12,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             padding: 20px;
             min-height: 100vh;
         }
@@ -29,16 +29,16 @@
         }
         
         .control-btn {
-            padding: 10px 14px;
-            border: 2px solid #000;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 14px;
             transition: all 0.3s ease;
             min-width: 140px;
             max-width: 180px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(30,64,175,0.2);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -49,20 +49,22 @@
             text-overflow: ellipsis;
         }
         
-        .btn-back { background: #28a745; color: white; }
+        .btn-back { background: #1e40af; color: white; }
         .btn-swap { background: #6f42c1; color: white; }
         .btn-export { background: #fd7e14; color: white; }
-        .btn-save { background: #17a2b8; color: white; }
+        .btn-save { background: #3b82f6; color: white; }
         
         .control-btn:hover {
-            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30,64,175,0.3);
+            filter: brightness(1.1);
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto 40px;
             background: white;
-            border: 4px solid #000;
+            border: 1px solid #e2e8f0;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             overflow: hidden;
@@ -71,10 +73,11 @@
         .header {
             display: flex;
             align-items: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #004085 0%, #0056b3 50%, #004085 100%);
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             color: white;
-            border-bottom: 3px solid #000;
+            border-bottom: 4px solid #1e40af;
+            box-shadow: 0 4px 20px rgba(30,64,175,0.3);
         }
         
         .header-text {
@@ -656,7 +659,8 @@
         }
 
         function goBack() {
-            window.location.href = 'timetable-new.htm';
+            const dept = localStorage.getItem('currentDepartment') || 'ISE';
+            window.location.href = 'page.htm?dept=' + encodeURIComponent(dept);
         }
 
         async function exportPDF() {
@@ -1007,6 +1011,22 @@
         }
         
         async function performSwap(cell1, cell2) {
+            const faculty1 = cell1.getAttribute('data-faculty');
+            const faculty2 = cell2.getAttribute('data-faculty');
+            const day1 = cell1.dataset.day;
+            const slot1 = cell1.dataset.slot;
+            const day2 = cell2.dataset.day;
+            const slot2 = cell2.dataset.slot;
+
+            // Pre-swap conflict check to ensure strict rule enforcement
+            const conflicts = await checkAdvancedSwapConflicts(faculty1, faculty2, day1, slot1, day2, slot2);
+            if (conflicts.length > 0) {
+                const conflictInfo = conflicts.map(c => `${c.faculty} is already busy in ${c.department} (${c.section})`).join('\n');
+                if (!confirm(`⚠️ Warning: This swap creates faculty conflicts:\n\n${conflictInfo}\n\nDo you want to proceed anyway?`)) {
+                    return;
+                }
+            }
+
             const data1 = {
                 subject: cell1.getAttribute('data-subject'),
                 faculty: cell1.getAttribute('data-faculty'),

@@ -43,8 +43,11 @@ class UnifiedTimetableEngine:
     def _load_global_settings(self) -> Dict[str, str]:
         try:
             response = self.supabase.table('global_settings').select('*').execute()
-            return {row['setting_key']: row['setting_value'] for row in response.data}
-        except:
+            if response.data:
+                return {row['setting_key']: row['setting_value'] for row in response.data}
+            return {}
+        except Exception as e:
+            print(f"Warning: Could not load global settings: {e}")
             return {}
     
     def _get_valid_lab_slots(self) -> List[Tuple[int, int]]:
@@ -576,11 +579,11 @@ if __name__ == '__main__':
     print("=" * 60)
     print("MIT MYSORE TIMETABLE ENGINE")
     print("=" * 60)
-    print("✓ All 5 constraints enforced")
-    print("✓ Global faculty conflict detection")
-    print("✓ Lab room clash prevention")
-    print("✓ Open Elective same-slot enforcement")
-    print("✓ Retry logic with 5 attempts")
+    print("[OK] All 5 constraints enforced")
+    print("[OK] Global faculty conflict detection")
+    print("[OK] Lab room clash prevention")
+    print("[OK] Open Elective same-slot enforcement")
+    print("[OK] Retry logic with 5 attempts")
     print("=" * 60)
     print("\nServer: http://localhost:5000")
     print("=" * 60)

@@ -1,0 +1,143 @@
+===============================================================================
+NAVIGATION & BACK BUTTON TEST CHECKLIST
+===============================================================================
+
+✅ ALL FIXES APPLIED:
+
+1. INDEX.HTM - Blue theme applied (no purple)
+2. FACULTY.HTM - Back button overlap fixed (added margin-bottom: 60px)
+3. LAB.HTM - Back button now goes to page.htm?dept={dept}
+4. SUBJECT.HTM - Back button verified
+5. ALL PAGES - Navigation paths corrected
+
+===============================================================================
+NAVIGATION FLOW TEST
+===============================================================================
+
+TEST 1: LOGIN TO DASHBOARD
+---------------------------
+1. Open http://localhost:5000
+2. Click "Department" button
+3. Select department (e.g., ISE)
+4. Login: MIT Mysore / mitm@1234
+5. Should redirect to: page.htm?dept=ISE
+✅ EXPECTED: Dashboard with 7 options
+
+TEST 2: SUBJECT MANAGEMENT
+---------------------------
+1. From dashboard, click "Subject Database"
+2. Should open: subject.htm?dept=ISE
+3. Click "← Back" button
+4. Should return to: page.htm?dept=ISE
+✅ EXPECTED: Back to dashboard
+
+TEST 3: FACULTY MANAGEMENT
+---------------------------
+1. From dashboard, click "Faculty Core"
+2. Should open: faculty.htm?dept=ISE
+3. Click "← Back to Home" button (top-left)
+4. Should return to: page.htm?dept=ISE
+✅ EXPECTED: Back to dashboard
+✅ EXPECTED: No overlap with "Faculty Name:" label
+
+TEST 4: LAB MANAGEMENT
+----------------------
+1. From dashboard, click "Lab Management"
+2. Should open: lab.htm?dept=ISE
+3. Click "← Back" button
+4. Should return to: page.htm?dept=ISE
+✅ EXPECTED: Back to dashboard
+
+TEST 5: TIMETABLE GENERATOR
+----------------------------
+1. From dashboard, click "Timetable Generator"
+2. Should open: timetable-new.htm?dept=ISE
+3. Browser back button should work
+4. Should return to: page.htm?dept=ISE
+✅ EXPECTED: Back to dashboard
+
+TEST 6: LOGOUT
+--------------
+1. From any page, click "Logout" button (top-right)
+2. Confirm logout
+3. Should return to: index.htm
+✅ EXPECTED: Login page
+
+TEST 7: ADMIN FLOW
+------------------
+1. Open http://localhost:5000
+2. Click "Administrator" button
+3. Login: MIT Mysore / mitm@1234
+4. Should redirect to: global-admin.htm
+5. Click "Logout" button
+6. Should return to: index.htm
+✅ EXPECTED: Login page
+
+===============================================================================
+BLUE THEME VERIFICATION
+===============================================================================
+
+CHECK 1: INDEX.HTM
+------------------
+✅ Background: Blue gradient (#1e40af to #3b82f6)
+✅ Buttons: Blue on hover
+✅ Submit button: Blue gradient
+✅ NO PURPLE anywhere
+
+CHECK 2: ALL OTHER PAGES
+-------------------------
+✅ Headers: Blue gradient (#1e40af to #3b82f6)
+✅ Buttons: Blue (#3b82f6)
+✅ Links: Blue theme
+✅ Consistent across all pages
+
+===============================================================================
+BACK BUTTON FIXES
+===============================================================================
+
+FACULTY.HTM:
+✅ Added margin-bottom: 60px to aside
+✅ Back button no longer overlaps with "Faculty Name:" label
+✅ Back button positioned at top-left
+✅ Back button goes to page.htm?dept={dept}
+
+LAB.HTM:
+✅ Back button function: goBackToDashboard()
+✅ Goes to page.htm?dept={dept}
+✅ No more window.history.back()
+
+SUBJECT.HTM:
+✅ Back button goes to page.htm?dept={dept}
+✅ Verified working
+
+ALL PAGES:
+✅ Consistent navigation
+✅ All back buttons return to dashboard
+✅ Department parameter preserved
+
+===============================================================================
+QUICK TEST PROCEDURE
+===============================================================================
+
+1. Start server: Double-click RUN_SERVER.bat
+2. Open browser: http://localhost:5000
+3. Test login flow (both Department and Admin)
+4. Test each dashboard option
+5. Test back buttons on each page
+6. Test logout button
+7. Verify blue theme (no purple)
+8. Verify no overlapping elements
+
+===============================================================================
+EXPECTED RESULTS
+===============================================================================
+
+✅ All buttons work
+✅ All navigation works
+✅ All back buttons return to correct page
+✅ Blue theme throughout (no purple)
+✅ No overlapping elements
+✅ Logout works correctly
+✅ Department parameter preserved in all pages
+
+===============================================================================

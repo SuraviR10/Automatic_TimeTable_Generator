@@ -301,7 +301,8 @@ section h2 {
 
 <main>
   <aside>
-    <button id="backBtn" style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%); color: white; border: none; padding: 10px 16px; font-size: 14px; border-radius: 25px; z-index: 10; width: auto; box-shadow: 0 4px 12px rgba(0,64,133,0.3); cursor: pointer; transition: all 0.3s ease;">← Back to Home</button>
+    <div style="margin-bottom: 60px;"></div>
+    <button id="backBtn" style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border: none; padding: 10px 16px; font-size: 14px; border-radius: 25px; z-index: 10; width: auto; box-shadow: 0 4px 12px rgba(30,64,175,0.3); cursor: pointer; transition: all 0.3s ease;">← Back to Home</button>
     
     <label>Faculty Name:</label>
     <input type="text" id="facultyNameInput" placeholder="Enter faculty name">
@@ -412,7 +413,9 @@ designationSelect.addEventListener('keydown', (e) => {
 });
 
 // Back button
-backBtn.onclick = () => window.location.href = `/page.htm?dept=${encodeURIComponent(currentDepartment)}`;
+backBtn.onclick = () => {
+  window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
+};
 
 // Load faculty data from Supabase
 async function loadFacultyData() {
@@ -572,7 +575,7 @@ function attachRowEvents() {
   document.querySelectorAll('.viewBtn').forEach(btn => {
     btn.onclick = () => {
         const facultyName = btn.dataset.name;
-        window.location.href = `/faculty-timetable.htm?faculty=${encodeURIComponent(facultyName)}&dept=${encodeURIComponent(currentDepartment)}`;
+        window.location.href = 'faculty-timetable.htm?faculty=' + encodeURIComponent(facultyName) + '&dept=' + encodeURIComponent(currentDepartment);
     };
   });
 }
