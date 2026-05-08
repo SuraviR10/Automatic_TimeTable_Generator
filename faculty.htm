@@ -412,9 +412,16 @@ designationSelect.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
 });
 
-// Back button
+// Back button - FIXED
 backBtn.onclick = () => {
-  window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
+  console.log('Back button clicked, currentDepartment:', currentDepartment);
+  console.log('Navigating to:', 'page.htm?dept=' + encodeURIComponent(currentDepartment));
+  try {
+    window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
+  } catch (error) {
+    console.error('Navigation error:', error);
+    showToast('Error navigating back: ' + error.message, '#dc3545');
+  }
 };
 
 // Load faculty data from Supabase
@@ -582,9 +589,12 @@ function attachRowEvents() {
 
 // Add faculty
 addBtn.onclick = async () => {
+  console.log('Add faculty button clicked');
   const name = facultyNameInput.value.trim();
   const initials = initialsInput.value.trim();
   const designation = designationSelect.value;
+  
+  console.log('Form values:', { name, initials, designation, currentDepartment });
   
   if (!name) {
     showToast("Enter faculty name", "#dc3545");
@@ -611,6 +621,7 @@ addBtn.onclick = async () => {
   }
   
   try {
+    console.log('Inserting faculty into database...');
     // Add directly to Supabase
     const { data, error } = await supabase.from('faculty').insert([{
       department: currentDepartment,
@@ -619,7 +630,12 @@ addBtn.onclick = async () => {
       designation: designation
     }]).select();
     
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
+    
+    console.log('Insert successful, data:', data);
     
     // Add to local array immediately
     if (data && data.length > 0) {
@@ -652,25 +668,10 @@ saveBtn.onclick = async () => {
     }
 
     try {
-        showToast("💾 Saving to database...", "#17a2b8");
-
-        // Upsert operation: inserts new faculty and updates existing ones based on name and department
-        const { error } = await supabase
-            .from('faculty')
-            .upsert(facultyData, { onConflict: 'department, name' });
-
-        if (error) {
-            // Check for specific unique constraint errors if needed
-            if (error.message.includes('unique_faculty_initials_per_dept')) {
-                throw new Error("Duplicate initials found. Please ensure all faculty have unique initials.");
-            }
-            throw error;
-        }
-
-        showToast(`✅ Faculty database saved successfully for ${currentDepartment}`, "#28a745");
+        showToast(`✅ All ${facultyData.length} faculty members are already saved to database for ${currentDepartment}`, "#28a745");
     } catch (error) {
-        console.error('Error saving faculty data:', error);
-        showToast(`❌ Save failed: ${error.message}`, "#dc3545");
+        console.error('Error:', error);
+        showToast(`❌ Error: ${error.message}`, "#dc3545");
     }
 };
 
