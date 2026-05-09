@@ -1,0 +1,332 @@
+================================================================================
+MIT MYSORE TIMETABLE GENERATOR - FINAL COMPREHENSIVE TEST
+================================================================================
+
+RUN THIS TEST TO VERIFY EVERYTHING IS WORKING
+==============================================
+
+STEP 1: START SERVER
+====================
+Command: py unified_server.py
+Expected: Server starts on http://localhost:5000
+Check: Console shows "Running on http://0.0.0.0:5000"
+
+STEP 2: TEST LOGIN SYSTEM
+==========================
+1. Open: http://localhost:5000
+2. Click "Department" button
+3. Select Department: ISE
+4. Username: MIT Mysore
+5. Password: ISE@123
+6. Click "Login"
+Expected: Redirects to page.htm?dept=ISE
+Check: Dashboard loads with 7 cards
+
+STEP 3: TEST SUBJECT DATABASE
+==============================
+1. Click "Subject Database" card
+2. Check: URL is subject.htm?dept=ISE
+3. Check: "Back to Dashboard" button visible
+4. Enter Academic Year: 2023-2024
+5. Select Year: 3
+6. Check: Semester dropdown shows "Semester 5" and "Semester 6"
+7. Select Semester: 5
+8. Enter Subject Code: 501
+9. Enter Subject Name: Theory of Computation
+10. Credits: 3
+11. Type: Theory
+12. Weekly Hours: 4
+13. Click "Add Subject"
+Expected: Toast shows "Subject added successfully"
+Check: Subject appears in table
+
+14. Add another subject:
+    - Code: 504
+    - Name: ST LAB
+    - Credits: 1
+    - Type: Lab
+    - Weekly Hours: 2
+15. Click "Add Subject"
+Expected: Both subjects visible in table
+
+16. Click "Delete" on first subject
+17. Confirm deletion
+Expected: Subject removed from table
+
+18. Click "Back to Dashboard"
+Expected: Returns to page.htm?dept=ISE
+
+STEP 4: TEST FACULTY CORE
+==========================
+1. Click "Faculty Core" card
+2. Check: URL is faculty.htm?dept=ISE
+3. Enter Name: Dr. Test Faculty
+4. Enter Initials: DTF
+5. Select Designation: Assistant Professor
+6. Click "Add Faculty"
+Expected: Faculty appears in table with Edit, Delete, View Timetable buttons
+
+7. Click "Back to Home"
+Expected: Returns to dashboard
+
+STEP 5: TEST LAB MANAGEMENT
+============================
+1. Click "Lab Management" card
+2. Check: URL is lab.htm?dept=ISE
+3. Enter Room Code: ISE-LAB-01
+4. Enter Lab Name: Database Lab
+5. Enter Capacity: 30
+6. Enter Equipment: 30 PCs, Projector
+7. Click "Add Lab Room"
+Expected: Lab room appears in table with Active status
+
+8. Click "Back" button
+Expected: Returns to dashboard
+
+STEP 6: TEST TIMETABLE GENERATOR
+=================================
+1. Click "Timetable Generator" card
+2. Check: URL is timetable-new.htm?dept=ISE
+3. Enter Academic Year: 2023-2024
+4. Select Year: 3
+5. Check: Semester dropdown updates
+6. Select Semester: 5
+7. Number of Sections: 1
+8. Check: Schedule Config shows periods, breaks
+9. Check: Timing Preview shows MIT Mysore schedule
+10. Click "Load Subjects"
+Expected: Subjects load in cards with overview stats
+
+11. Click "Assign Faculty"
+Expected: Faculty assignment interface appears
+
+12. For each subject, select a faculty from dropdown
+13. Click "Generate Timetable"
+Expected: Loading overlay appears
+Expected: Generation completes
+Expected: Redirects to enhanced.htm
+
+STEP 7: TEST ENHANCED VIEW
+===========================
+1. Check: Timetable displays with all days and periods
+2. Check: Tea break after P2 (11:00-11:15)
+3. Check: Lunch break after P4 (13:15-14:00)
+4. Check: Labs appear in 2-hour blocks
+5. Check: NSS/FREE only in P6
+6. Check: Subject names and faculty initials visible
+
+7. Click "Smart Swap" button
+Expected: Swappable cells highlighted
+8. Click two theory cells
+Expected: Swap executes with animation
+
+9. Click "Export PDF" button
+Expected: PDF downloads with all sections
+
+10. Click "Save Timetable" button
+Expected: Success message with entry count
+
+11. Click "Finalize & Save" button
+12. Confirm finalization
+Expected: Success message
+Expected: Button changes to "Finalized"
+
+13. Click "Back" button
+Expected: Returns to dashboard
+
+STEP 8: TEST ADMIN DASHBOARD
+=============================
+1. Logout from department
+2. Click "Administrator" button
+3. Username: MIT Mysore
+4. Password: mitm@1234
+5. Click "Login"
+Expected: Redirects to global-admin.htm
+
+6. Check: Work Week Configuration shows checkboxes
+7. Check: Tuesday-Saturday checked by default
+8. Check: Time Slots Configuration shows all fields
+9. Check: Break Management shows tea and lunch breaks
+10. Check: OE Mega-Constraint section visible
+
+11. Enter OE details:
+    - Academic Year: 2023-2024
+    - Year: 3
+    - Semester: 6
+    - Subject Code: OE601
+    - Subject Name: Machine Learning
+    - Locked Day: Thursday
+    - Locked Time Slot: Period 3
+12. Click "Lock OE Slot"
+Expected: OE appears in table below
+
+13. Click "Save Global Configuration"
+Expected: Success message
+
+14. Click "Logout"
+Expected: Returns to index.htm
+
+STEP 9: VERIFY CONSTRAINTS
+===========================
+Generate a timetable and verify:
+
+1. STRICT WEEKLY HOURS
+   - Count occurrences of each subject
+   - Should match weekly_hours exactly
+
+2. DAILY DIVERSITY
+   - Check each day
+   - No subject should appear twice on same day
+
+3. LAB CONTINUITY
+   - Labs should be in P1-P2, P3-P4, or P5-P6
+   - Never in P2-P3 or P4-P5
+
+4. NSS/FREE → P6 ONLY
+   - NSS/FREE should only appear in Period 6
+
+5. FACULTY CONFLICT
+   - No faculty should teach two classes simultaneously
+
+6. LAB ROOM CLASH
+   - No lab room used by multiple sections at same time
+
+7. OE SAME-SLOT
+   - All OE subjects at same time across departments
+
+STEP 10: VERIFY DATABASE
+=========================
+1. Check Supabase dashboard
+2. Verify tables exist:
+   - subjects
+   - faculty
+   - timetables
+   - lab_rooms
+   - global_settings
+   - open_electives
+   - admin_users
+   - users
+
+3. Check data in tables:
+   - subjects table has test subjects
+   - faculty table has test faculty
+   - timetables table has generated timetable
+   - lab_rooms table has test lab room
+   - global_settings table has MIT Mysore defaults
+   - open_electives table has test OE
+
+STEP 11: VERIFY PYTHON 3.13 COMPATIBILITY
+==========================================
+1. Run: py --version
+Expected: Python 3.13.13
+
+2. Run: py VERIFY_SYSTEM.py
+Expected: All checks pass
+
+3. Check for deprecation warnings
+Expected: None
+
+STEP 12: VERIFY BROWSER COMPATIBILITY
+======================================
+Test in each browser:
+1. Chrome - All features work
+2. Edge - All features work
+3. Firefox - All features work
+
+STEP 13: VERIFY RESPONSIVE DESIGN
+==================================
+1. Resize browser window
+2. Check mobile view (< 768px)
+3. Check tablet view (768px - 1024px)
+4. Check desktop view (> 1024px)
+Expected: Layout adapts properly
+
+STEP 14: VERIFY ERROR HANDLING
+===============================
+1. Try to login with wrong password
+Expected: Error message displays
+
+2. Try to add subject without required fields
+Expected: Warning toast appears
+
+3. Try to generate timetable without faculty assignment
+Expected: Error message displays
+
+4. Try to access page without login
+Expected: Redirects to login
+
+STEP 15: VERIFY PERFORMANCE
+============================
+1. Measure page load time
+Expected: < 2 seconds
+
+2. Measure timetable generation time
+Expected: < 30 seconds
+
+3. Check for memory leaks
+Expected: None
+
+4. Check for console errors
+Expected: None
+
+================================================================================
+TEST RESULTS CHECKLIST
+================================================================================
+
+[ ] Server starts successfully
+[ ] Login system works (Department and Admin)
+[ ] Subject Database - All CRUD operations work
+[ ] Faculty Core - All CRUD operations work
+[ ] Lab Management - All CRUD operations work
+[ ] Timetable Generator - Loads subjects and assigns faculty
+[ ] Timetable Generation - Completes successfully
+[ ] Enhanced View - Displays timetable correctly
+[ ] Smart Swap - Works without conflicts
+[ ] PDF Export - Generates PDF successfully
+[ ] Finalize - Saves to database
+[ ] Admin Dashboard - All settings save
+[ ] OE Constraints - Lock and apply correctly
+[ ] All 10 Constraints - Enforced in generated timetable
+[ ] Database - All tables populated correctly
+[ ] Python 3.13 - No compatibility issues
+[ ] Browser Compatibility - Works in all browsers
+[ ] Responsive Design - Adapts to all screen sizes
+[ ] Error Handling - All errors handled gracefully
+[ ] Performance - Meets all benchmarks
+
+================================================================================
+FINAL TEST STATUS
+================================================================================
+
+If all checkboxes are checked, the system is:
+✓ FULLY FUNCTIONAL
+✓ PRODUCTION READY
+✓ ERROR-FREE
+✓ INTERFACE PERFECT
+✓ ALL CONSTRAINTS ENFORCED
+
+System is ready for deployment and use at MIT Mysore.
+
+================================================================================
+TROUBLESHOOTING DURING TESTING
+================================================================================
+
+If any test fails:
+
+1. Clear browser cache (Ctrl+Shift+Delete)
+2. Hard refresh page (Ctrl+F5)
+3. Check server console for errors
+4. Check browser console (F12) for errors
+5. Verify Supabase connection
+6. Restart server
+7. Check Python version (py --version)
+8. Reinstall packages (pip install -r requirements.txt)
+
+If issue persists:
+- Check FINAL_SYSTEM_STATUS.txt
+- Check COMPLETE_DEPLOYMENT_GUIDE.txt
+- Check INTERFACE_VERIFICATION.txt
+- Check server logs
+- Check database tables
+
+================================================================================

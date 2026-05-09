@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Button Test Page</title>
+  <style>
+    body { font-family: Arial; padding: 40px; background: #f0f0f0; }
+    .test-section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    button { padding: 12px 24px; margin: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .result { padding: 15px; margin: 10px 0; border-radius: 6px; font-weight: 600; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .info { background: #d1ecf1; color: #0c5460; }
+  </style>
+</head>
+<body>
+  <h1>🔧 Button Functionality Test Page</h1>
+  <p>This page tests if JavaScript and buttons are working correctly.</p>
+
+  <!-- TEST 1: Basic Button Click -->
+  <div class="test-section">
+    <h2>TEST 1: Basic Button Click</h2>
+    <button class="btn-primary" onclick="test1()">Click Me!</button>
+    <div id="test1Result"></div>
+  </div>
+
+  <!-- TEST 2: Event Listener -->
+  <div class="test-section">
+    <h2>TEST 2: Event Listener</h2>
+    <button class="btn-success" id="test2Btn">Click Me (Event Listener)</button>
+    <div id="test2Result"></div>
+  </div>
+
+  <!-- TEST 3: Async Function -->
+  <div class="test-section">
+    <h2>TEST 3: Async Function</h2>
+    <button class="btn-primary" onclick="test3()">Test Async</button>
+    <div id="test3Result"></div>
+  </div>
+
+  <!-- TEST 4: Supabase Connection -->
+  <div class="test-section">
+    <h2>TEST 4: Supabase Connection</h2>
+    <button class="btn-success" onclick="test4()">Test Supabase</button>
+    <div id="test4Result"></div>
+  </div>
+
+  <!-- TEST 5: Server Connection -->
+  <div class="test-section">
+    <h2>TEST 5: Server Connection</h2>
+    <button class="btn-primary" onclick="test5()">Test Server</button>
+    <div id="test5Result"></div>
+  </div>
+
+  <!-- TEST 6: Navigation -->
+  <div class="test-section">
+    <h2>TEST 6: Navigation</h2>
+    <button class="btn-success" onclick="test6()">Test Navigation</button>
+    <div id="test6Result"></div>
+  </div>
+
+  <!-- TEST 7: LocalStorage -->
+  <div class="test-section">
+    <h2>TEST 7: LocalStorage</h2>
+    <button class="btn-primary" onclick="test7()">Test LocalStorage</button>
+    <div id="test7Result"></div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="test-section">
+    <h2>📊 Test Summary</h2>
+    <div id="summary"></div>
+    <button class="btn-danger" onclick="runAllTests()">Run All Tests</button>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    let testResults = {
+      test1: false,
+      test2: false,
+      test3: false,
+      test4: false,
+      test5: false,
+      test6: false,
+      test7: false
+    };
+
+    // TEST 1: Basic onclick
+    function test1() {
+      console.log('Test 1: Basic onclick executed');
+      document.getElementById('test1Result').innerHTML = '<div class="result success">✓ TEST 1 PASSED: Basic onclick works!</div>';
+      testResults.test1 = true;
+      updateSummary();
+    }
+
+    // TEST 2: Event Listener
+    document.getElementById('test2Btn').addEventListener('click', function() {
+      console.log('Test 2: Event listener executed');
+      document.getElementById('test2Result').innerHTML = '<div class="result success">✓ TEST 2 PASSED: Event listeners work!</div>';
+      testResults.test2 = true;
+      updateSummary();
+    });
+
+    // TEST 3: Async Function
+    async function test3() {
+      console.log('Test 3: Async function started');
+      document.getElementById('test3Result').innerHTML = '<div class="result info">Testing async...</div>';
+      
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('Test 3: Async function completed');
+        document.getElementById('test3Result').innerHTML = '<div class="result success">✓ TEST 3 PASSED: Async/await works!</div>';
+        testResults.test3 = true;
+      } catch (error) {
+        console.error('Test 3 error:', error);
+        document.getElementById('test3Result').innerHTML = '<div class="result error">✗ TEST 3 FAILED: ' + error.message + '</div>';
+      }
+      updateSummary();
+    }
+
+    // TEST 4: Supabase Connection
+    async function test4() {
+      console.log('Test 4: Testing Supabase connection');
+      document.getElementById('test4Result').innerHTML = '<div class="result info">Testing Supabase...</div>';
+      
+      try {
+        if (typeof window.supabase === 'undefined') {
+          throw new Error('Supabase library not loaded');
+        }
+
+        const SUPABASE_URL = 'https://zfzmnimjekmkyefslflf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpmem1uaW1qZWtta3llZnNsZmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3ODkwOTcsImV4cCI6MjA3ODM2NTA5N30.ffXDOtk9ZEPjCLrI4ahK2lHmbzbjzix3Z9zS19c5lTA';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { data, error } = await supabase.from('global_settings').select('*').limit(1);
+        
+        if (error) throw error;
+        
+        console.log('Test 4: Supabase connected, data:', data);
+        document.getElementById('test4Result').innerHTML = '<div class="result success">✓ TEST 4 PASSED: Supabase connected! Found ' + (data ? data.length : 0) + ' settings.</div>';
+        testResults.test4 = true;
+      } catch (error) {
+        console.error('Test 4 error:', error);
+        document.getElementById('test4Result').innerHTML = '<div class="result error">✗ TEST 4 FAILED: ' + error.message + '</div>';
+      }
+      updateSummary();
+    }
+
+    // TEST 5: Server Connection
+    async function test5() {
+      console.log('Test 5: Testing server connection');
+      document.getElementById('test5Result').innerHTML = '<div class="result info">Testing server...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:5000/health');
+        const data = await response.json();
+        
+        console.log('Test 5: Server response:', data);
+        document.getElementById('test5Result').innerHTML = '<div class="result success">✓ TEST 5 PASSED: Server is running! ' + data.message + '</div>';
+        testResults.test5 = true;
+      } catch (error) {
+        console.error('Test 5 error:', error);
+        document.getElementById('test5Result').innerHTML = '<div class="result error">✗ TEST 5 FAILED: Server not running or not accessible. Start server with: py unified_server.py</div>';
+      }
+      updateSummary();
+    }
+
+    // TEST 6: Navigation
+    function test6() {
+      console.log('Test 6: Testing navigation');
+      try {
+        const testUrl = 'page.htm?dept=ISE';
+        console.log('Test 6: Would navigate to:', testUrl);
+        document.getElementById('test6Result').innerHTML = '<div class="result success">✓ TEST 6 PASSED: Navigation works! (Would go to: ' + testUrl + ')</div>';
+        testResults.test6 = true;
+      } catch (error) {
+        console.error('Test 6 error:', error);
+        document.getElementById('test6Result').innerHTML = '<div class="result error">✗ TEST 6 FAILED: ' + error.message + '</div>';
+      }
+      updateSummary();
+    }
+
+    // TEST 7: LocalStorage
+    function test7() {
+      console.log('Test 7: Testing localStorage');
+      try {
+        localStorage.setItem('test', 'value');
+        const value = localStorage.getItem('test');
+        localStorage.removeItem('test');
+        
+        if (value === 'value') {
+          console.log('Test 7: localStorage works');
+          document.getElementById('test7Result').innerHTML = '<div class="result success">✓ TEST 7 PASSED: LocalStorage works!</div>';
+          testResults.test7 = true;
+        } else {
+          throw new Error('LocalStorage read/write failed');
+        }
+      } catch (error) {
+        console.error('Test 7 error:', error);
+        document.getElementById('test7Result').innerHTML = '<div class="result error">✗ TEST 7 FAILED: ' + error.message + '</div>';
+      }
+      updateSummary();
+    }
+
+    // Update Summary
+    function updateSummary() {
+      const passed = Object.values(testResults).filter(r => r).length;
+      const total = Object.keys(testResults).length;
+      const percentage = Math.round((passed / total) * 100);
+      
+      let summaryHTML = `<h3>Results: ${passed}/${total} tests passed (${percentage}%)</h3>`;
+      summaryHTML += '<ul style="list-style: none; padding: 0;">';
+      
+      for (let test in testResults) {
+        const status = testResults[test] ? '✓' : '✗';
+        const color = testResults[test] ? 'green' : 'red';
+        summaryHTML += `<li style="color: ${color}; font-weight: 600; margin: 5px 0;">${status} ${test.toUpperCase()}</li>`;
+      }
+      
+      summaryHTML += '</ul>';
+      
+      if (passed === total) {
+        summaryHTML += '<div class="result success" style="margin-top: 20px;">🎉 ALL TESTS PASSED! Your system is working correctly.</div>';
+      } else {
+        summaryHTML += '<div class="result error" style="margin-top: 20px;">⚠️ Some tests failed. Check console for details.</div>';
+      }
+      
+      document.getElementById('summary').innerHTML = summaryHTML;
+    }
+
+    // Run All Tests
+    async function runAllTests() {
+      console.log('Running all tests...');
+      test1();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      document.getElementById('test2Btn').click();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await test3();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await test4();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await test5();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      test6();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      test7();
+    }
+
+    // Initialize
+    console.log('Button Test Page loaded');
+    updateSummary();
+  </script>
+</body>
+</html>

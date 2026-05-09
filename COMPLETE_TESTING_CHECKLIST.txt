@@ -1,0 +1,365 @@
+================================================================================
+MIT MYSORE TIMETABLE GENERATOR - COMPLETE TESTING CHECKLIST
+================================================================================
+
+TEST DATE: _______________
+TESTER NAME: _______________
+PYTHON VERSION: 3.13.13
+
+================================================================================
+PRE-TESTING SETUP
+================================================================================
+
+[ ] 1. Server started successfully (py unified_server.py)
+[ ] 2. Browser opened at http://localhost:5000
+[ ] 3. No console errors in terminal
+[ ] 4. Supabase connection verified
+
+================================================================================
+MODULE 1: LOGIN SYSTEM
+================================================================================
+
+DEPARTMENT LOGIN:
+[ ] 1. Login page loads correctly
+[ ] 2. Can enter department code (ISE, CSE, AIML, ECE)
+[ ] 3. Login redirects to dashboard
+[ ] 4. Department name displayed correctly
+
+ADMIN LOGIN:
+[ ] 5. Admin login page accessible
+[ ] 6. Username: admin, Password: Admin@1234 works
+[ ] 7. Redirects to admin dashboard
+[ ] 8. All admin options visible
+
+================================================================================
+MODULE 2: SUBJECT DATABASE (subject.htm)
+================================================================================
+
+NAVIGATION:
+[ ] 1. "Back to Dashboard" button works
+[ ] 2. Returns to page.htm with correct dept parameter
+[ ] 3. No console errors on navigation
+
+YEAR-SEMESTER DROPDOWN:
+[ ] 4. Academic Year input accepts text (e.g., 2023-2024)
+[ ] 5. Year dropdown shows: 1st Year, 2nd Year, 3rd Year, 4th Year
+[ ] 6. Selecting Year 1 shows: Semester 1, Semester 2
+[ ] 7. Selecting Year 2 shows: Semester 3, Semester 4
+[ ] 8. Selecting Year 3 shows: Semester 5, Semester 6
+[ ] 9. Selecting Year 4 shows: Semester 7, Semester 8
+[ ] 10. Semester dropdown updates immediately after year selection
+
+ADD SUBJECT:
+[ ] 11. Subject Code input accepts text
+[ ] 12. Subject Name input accepts text (required)
+[ ] 13. Credits dropdown works (1-6)
+[ ] 14. Type dropdown shows: Theory, Lab, Free
+[ ] 15. Weekly Hours input accepts numbers (1-10)
+[ ] 16. Cross-Department checkbox works
+[ ] 17. Teaching Department dropdown appears when cross-dept checked
+[ ] 18. Open Elective checkbox works
+[ ] 19. "Add Subject" button adds subject to database
+[ ] 20. Toast notification shows success message
+[ ] 21. Subject appears in table immediately
+
+VIEW SUBJECTS:
+[ ] 22. Table shows all subjects for selected year/semester
+[ ] 23. Subject Code column displays correctly
+[ ] 24. Subject Name column displays correctly
+[ ] 25. Credits column displays correctly
+[ ] 26. Type column displays correctly (THEORY/LAB/FREE)
+[ ] 27. Weekly Hours column displays correctly
+[ ] 28. Open Elective subjects show (OE) badge
+[ ] 29. Cross-department subjects show (Cross) badge
+
+DELETE SUBJECT:
+[ ] 30. Delete button shows for each subject
+[ ] 31. Confirmation dialog appears on delete
+[ ] 32. Subject deleted from database
+[ ] 33. Table updates immediately
+[ ] 34. Toast notification shows success
+
+CLEAR ALL:
+[ ] 35. "Clear All" button shows warning dialog
+[ ] 36. All subjects deleted for selected semester
+[ ] 37. Table shows empty state
+[ ] 38. Toast notification confirms deletion
+
+SAVE DATABASE:
+[ ] 39. "Confirm Saved" button shows success message
+[ ] 40. Verifies subjects are in database
+
+================================================================================
+MODULE 3: FACULTY CORE (faculty.htm)
+================================================================================
+
+NAVIGATION:
+[ ] 1. "Back to Home" button works
+[ ] 2. Returns to dashboard with correct dept parameter
+[ ] 3. No console errors
+
+ADD FACULTY:
+[ ] 4. Faculty Name input accepts text
+[ ] 5. Initials input accepts text (e.g., Dr. ABC)
+[ ] 6. Designation dropdown shows all options
+[ ] 7. "Add Faculty" button adds to database
+[ ] 8. Faculty appears in table immediately
+[ ] 9. Toast notification shows success
+
+VIEW FACULTY:
+[ ] 10. Table shows all faculty for department
+[ ] 11. Name column displays correctly
+[ ] 12. Initials column displays correctly
+[ ] 13. Designation column displays correctly
+[ ] 14. Department column displays correctly
+[ ] 15. Faculty Statistics shows correct counts
+
+EDIT FACULTY:
+[ ] 16. Edit button opens edit form
+[ ] 17. Can modify faculty details
+[ ] 18. Changes saved to database
+[ ] 19. Table updates immediately
+
+DELETE FACULTY:
+[ ] 20. Delete button shows confirmation
+[ ] 21. Faculty deleted from database
+[ ] 22. Table updates immediately
+
+VIEW TIMETABLE:
+[ ] 23. "View Timetable" button works
+[ ] 24. Shows faculty schedule if timetable generated
+
+SAVE DATABASE:
+[ ] 25. "Save Database" button confirms save
+[ ] 26. "View All Faculty" button shows all faculty
+
+CLEAR ALL:
+[ ] 27. "Clear All" button shows warning
+[ ] 28. All faculty deleted for department
+
+================================================================================
+MODULE 4: TIMETABLE GENERATOR (timetable-new.htm)
+================================================================================
+
+QUICK SETUP:
+[ ] 1. Academic Year input accepts text
+[ ] 2. Year dropdown shows 1, 2, 3, 4
+[ ] 3. Semester dropdown updates based on year
+[ ] 4. Number of Sections input accepts numbers (1-10)
+
+SCHEDULE CONFIG:
+[ ] 5. Periods per Day loaded from admin settings
+[ ] 6. Start Time loaded correctly
+[ ] 7. End Time loaded correctly
+[ ] 8. Tea Break After Period loaded correctly
+[ ] 9. Lunch Break After Period loaded correctly
+
+LOAD SUBJECTS:
+[ ] 10. "Load Subjects" button loads subjects from database
+[ ] 11. Subject cards display correctly
+[ ] 12. Shows subject code, name, type, weekly hours
+[ ] 13. Subject count matches database
+
+FACULTY ASSIGNMENT:
+[ ] 14. "Assign Faculty" button shows assignment interface
+[ ] 15. Each subject shows section rows (A, B, C, etc.)
+[ ] 16. Faculty dropdown populated for each subject-section
+[ ] 17. Cross-department subjects show faculty from teaching dept
+[ ] 18. FREE subjects show "N/A" option
+[ ] 19. Can select different faculty for different sections
+
+GENERATE TIMETABLE:
+[ ] 20. "Generate Timetable" button validates all assignments
+[ ] 21. Shows error if faculty not assigned
+[ ] 22. Loading overlay appears during generation
+[ ] 23. Progress message shows "Generating Timetable..."
+[ ] 24. Generation completes successfully
+[ ] 25. Success message shows number of sections generated
+[ ] 26. Redirects to enhanced.htm
+[ ] 27. Timetable data stored in localStorage
+
+ERROR HANDLING:
+[ ] 28. Shows friendly error if server not running
+[ ] 29. Shows error if generation fails
+[ ] 30. Retry logic attempts up to 5 times automatically
+
+================================================================================
+MODULE 5: CONSTRAINT VERIFICATION
+================================================================================
+
+CONSTRAINT 1: STRICT WEEKLY HOURS
+[ ] 1. Subject with 3 weekly hours placed exactly 3 times
+[ ] 2. Subject with 4 weekly hours placed exactly 4 times
+[ ] 3. Lab with 2 weekly hours placed exactly 2 times (1 lab session)
+
+CONSTRAINT 2: DAILY DIVERSITY
+[ ] 4. Same subject NOT repeated on same day
+[ ] 5. Each day has different subjects
+
+CONSTRAINT 3: LAB CONTINUITY
+[ ] 6. Labs placed in P1-P2 slot
+[ ] 7. Labs placed in P3-P4 slot
+[ ] 8. Labs placed in P5-P6 slot
+[ ] 9. Labs NEVER in P2-P3 (crosses tea break)
+[ ] 10. Labs NEVER in P4-P5 (crosses lunch break)
+
+CONSTRAINT 4: NSS/FREE → P6 ONLY
+[ ] 11. NSS subject only in Period 6
+[ ] 12. FREE subject only in Period 6
+[ ] 13. NSS/FREE appears once per week
+
+CONSTRAINT 5: GLOBAL FACULTY CONFLICT
+[ ] 14. Faculty not double-booked across sections
+[ ] 15. Faculty not double-booked across departments
+[ ] 16. Faculty conflict check works in Smart Swap
+
+CONSTRAINT 6: LAB ROOM CLASH
+[ ] 17. Same lab room not used by multiple sections simultaneously
+[ ] 18. Department lab rooms tracked correctly
+
+CONSTRAINT 7: OPEN ELECTIVE SAME-SLOT
+[ ] 19. OE subjects at same time across all departments
+[ ] 20. Admin-locked OE slot respected
+
+================================================================================
+MODULE 6: ENHANCED VIEW & FINALIZATION
+================================================================================
+
+VIEW TIMETABLE:
+[ ] 1. Generated timetable displays correctly
+[ ] 2. All days shown (Tuesday-Saturday)
+[ ] 3. All periods shown (P1-P6)
+[ ] 4. Subject names displayed
+[ ] 5. Faculty names displayed
+[ ] 6. Room numbers displayed
+
+SMART SWAP:
+[ ] 7. Can select two slots to swap
+[ ] 8. Validation checks faculty conflicts
+[ ] 9. Shows error if conflict exists
+[ ] 10. Suggests safe slots for faculty
+[ ] 11. Swap executes successfully if valid
+
+PDF EXPORT:
+[ ] 12. "Export to PDF" button works
+[ ] 13. PDF generated with correct formatting
+[ ] 14. All timetable data included in PDF
+
+FINALIZE:
+[ ] 15. "Finalize" button saves to database
+[ ] 16. is_finalized flag set to true
+[ ] 17. Timetable locked from further changes
+[ ] 18. Success message displayed
+
+================================================================================
+MODULE 7: ADMIN DASHBOARD
+================================================================================
+
+GLOBAL SETTINGS:
+[ ] 1. Can modify working days
+[ ] 2. Can modify periods per day
+[ ] 3. Can modify break timings
+[ ] 4. Settings saved to database
+[ ] 5. Settings loaded by departments
+
+OPEN ELECTIVE LOCKING:
+[ ] 6. Can add OE subject
+[ ] 7. Can lock day and time slot
+[ ] 8. OE constraint enforced during generation
+[ ] 9. Can view all locked OE slots
+
+CLASSROOM MANAGEMENT:
+[ ] 10. Can add classroom
+[ ] 11. Can set capacity
+[ ] 12. Can set room type (Theory/Lab)
+[ ] 13. Classrooms visible to all departments
+
+================================================================================
+MODULE 8: DATABASE OPERATIONS
+================================================================================
+
+SUBJECTS TABLE:
+[ ] 1. INSERT works (Add Subject)
+[ ] 2. SELECT works (Load Subjects)
+[ ] 3. DELETE works (Delete Subject)
+[ ] 4. UPDATE works (Edit Subject)
+
+FACULTY TABLE:
+[ ] 5. INSERT works (Add Faculty)
+[ ] 6. SELECT works (Load Faculty)
+[ ] 7. DELETE works (Delete Faculty)
+[ ] 8. UPDATE works (Edit Faculty)
+
+TIMETABLES TABLE:
+[ ] 9. INSERT works (Generate Timetable)
+[ ] 10. SELECT works (View Timetable)
+[ ] 11. UPDATE works (Smart Swap)
+[ ] 12. DELETE works (Clear Timetable)
+
+LAB_ROOMS TABLE:
+[ ] 13. INSERT works (Add Lab Room)
+[ ] 14. SELECT works (Load Lab Rooms)
+[ ] 15. UPDATE works (Soft Delete)
+
+GLOBAL_SETTINGS TABLE:
+[ ] 16. SELECT works (Load Settings)
+[ ] 17. UPDATE works (Modify Settings)
+
+OPEN_ELECTIVES TABLE:
+[ ] 18. INSERT works (Lock OE Slot)
+[ ] 19. SELECT works (Load OE Constraints)
+
+================================================================================
+MODULE 9: BROWSER COMPATIBILITY
+================================================================================
+
+CHROME:
+[ ] 1. All pages load correctly
+[ ] 2. All buttons work
+[ ] 3. All dropdowns work
+[ ] 4. No console errors
+
+EDGE:
+[ ] 5. All pages load correctly
+[ ] 6. All buttons work
+[ ] 7. All dropdowns work
+[ ] 8. No console errors
+
+FIREFOX:
+[ ] 9. All pages load correctly
+[ ] 10. All buttons work
+[ ] 11. All dropdowns work
+[ ] 12. No console errors
+
+================================================================================
+MODULE 10: PERFORMANCE TESTING
+================================================================================
+
+[ ] 1. Subject Database loads < 2 seconds
+[ ] 2. Faculty Core loads < 2 seconds
+[ ] 3. Timetable generation completes < 30 seconds
+[ ] 4. Database queries execute < 1 second
+[ ] 5. Page navigation instant
+[ ] 6. No memory leaks after extended use
+
+================================================================================
+FINAL VERIFICATION
+================================================================================
+
+[ ] 1. All modules tested
+[ ] 2. All constraints verified
+[ ] 3. All CRUD operations working
+[ ] 4. No critical bugs found
+[ ] 5. System ready for production
+
+OVERALL RESULT: [ ] PASS  [ ] FAIL
+
+NOTES:
+_____________________________________________________________________________
+_____________________________________________________________________________
+_____________________________________________________________________________
+_____________________________________________________________________________
+
+TESTER SIGNATURE: ___________________  DATE: _______________
+
+================================================================================

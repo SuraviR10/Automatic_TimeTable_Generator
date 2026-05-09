@@ -322,7 +322,7 @@
       'Mechanical': 'MECH@123',
       'Civil': 'CIVIL@123'
     };
-    const ADMIN_PASSWORD = 'mitm@1234';
+    const ADMIN_PASSWORD = 'Admin@1234';
 
     function showDepartmentLogin() {
       document.getElementById('roleSelection').classList.add('hidden');
@@ -378,7 +378,7 @@
       const errorDiv = document.getElementById('adminError');
 
       if (username !== VALID_USERNAME || password !== ADMIN_PASSWORD) {
-        errorDiv.textContent = 'Invalid credentials. Use: MIT Mysore / mitm@1234';
+        errorDiv.textContent = 'Invalid credentials. Use: MIT Mysore / Admin@1234';
         errorDiv.style.display = 'block';
         return;
       }

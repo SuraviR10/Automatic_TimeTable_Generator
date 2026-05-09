@@ -140,6 +140,30 @@
             </table>
         </div>
 
+        <!-- Classroom Management -->
+        <div class="section">
+            <h2>Classroom Management</h2>
+            <p>Add classrooms with capacity and type for automatic allocation during timetable generation.</p>
+            <div class="form-grid">
+                <div><label>Room Number:</label><input type="text" id="roomNumber" placeholder="e.g., 101, LAB-201"></div>
+                <div><label>Capacity:</label><input type="number" id="roomCapacity" min="1" max="500" placeholder="e.g., 60"></div>
+                <div><label>Type:</label>
+                    <select id="roomType">
+                        <option value="theory">Theory</option>
+                        <option value="lab">Lab</option>
+                    </select>
+                </div>
+                <div><label>Building/Floor:</label><input type="text" id="roomLocation" placeholder="e.g., Main Block, 1st Floor"></div>
+            </div>
+            <button class="btn" onclick="addClassroom()" style="margin-top:15px;">Add Classroom</button>
+            <table class="oe-table" id="classroomTable">
+                <thead>
+                    <tr><th>Room Number</th><th>Capacity</th><th>Type</th><th>Location</th><th>Status</th><th>Action</th></tr>
+                </thead>
+                <tbody id="classroomTableBody"></tbody>
+            </table>
+        </div>
+
         <button class="btn" onclick="saveGlobalSettings()" style="width:100%;font-size:18px;">Save Global Configuration</button>
     </div>
 
@@ -259,6 +283,65 @@
                 `Labs cannot be placed in periods ${tea}-${parseInt(tea)+1} (Tea Break) or ${lunch}-${parseInt(lunch)+1} (Lunch Break)`;
         }
 
+        async function addClassroom() {
+            const roomNumber = document.getElementById('roomNumber').value.trim();
+            const capacity = document.getElementById('roomCapacity').value;
+            const type = document.getElementById('roomType').value;
+            const location = document.getElementById('roomLocation').value.trim();
+
+            if (!roomNumber || !capacity) {
+                showAlert('Please fill room number and capacity', 'danger');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.from('classrooms').insert({
+                    room_number: roomNumber,
+                    capacity: parseInt(capacity),
+                    type: type,
+                    location: location,
+                    is_active: true
+                });
+                if (error) throw error;
+                showAlert('Classroom added successfully', 'success');
+                document.getElementById('roomNumber').value = '';
+                document.getElementById('roomCapacity').value = '';
+                document.getElementById('roomLocation').value = '';
+                loadClassrooms();
+            } catch (error) {
+                showAlert('Error adding classroom: ' + error.message, 'danger');
+            }
+        }
+
+        async function loadClassrooms() {
+            try {
+                const { data, error } = await supabase.from('classrooms').select('*').order('room_number');
+                if (error) throw error;
+                document.getElementById('classroomTableBody').innerHTML = (data || []).map(room => `
+                    <tr>
+                        <td><strong>${room.room_number}</strong></td>
+                        <td>${room.capacity}</td>
+                        <td><span style="text-transform:uppercase;font-weight:600;">${room.type}</span></td>
+                        <td>${room.location || 'N/A'}</td>
+                        <td><span style="color:${room.is_active ? '#28a745' : '#dc3545'};">${room.is_active ? 'Active' : 'Inactive'}</span></td>
+                        <td><button onclick="toggleClassroom(${room.id}, ${!room.is_active})" style="background:#ffc107;color:black;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">${room.is_active ? 'Deactivate' : 'Activate'}</button></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading classrooms:', error);
+            }
+        }
+
+        async function toggleClassroom(id, active) {
+            try {
+                await supabase.from('classrooms').update({ is_active: active }).eq('id', id);
+                showAlert(`Classroom ${active ? 'activated' : 'deactivated'}`, 'success');
+                loadClassrooms();
+            } catch (error) {
+                showAlert('Error updating classroom: ' + error.message, 'danger');
+            }
+        }
+
         async function loadSettings() {
             try {
                 const { data } = await supabase.from('global_settings').select('*');
@@ -288,6 +371,7 @@
 
         loadSettings();
         loadOEConstraints();
+        loadClassrooms();
     </script>
 </body>
 </html>

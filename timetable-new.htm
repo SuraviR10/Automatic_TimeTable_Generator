@@ -45,12 +45,14 @@
 </div>
 
 <div class="container">
+    <button class="btn btn-success" onclick="goBackToDashboard()" style="margin-bottom:20px;">← Back to Dashboard</button>
+
     <div class="card">
         <h2>Quick Setup</h2>
         <label>Academic Year</label>
         <input id="academicYear" type="text" placeholder="e.g. 2024-25" value="2024-25" />
         <label>Year</label>
-        <select id="yearSelect">
+        <select id="yearSelect" onchange="updateSemesterDropdown()">
             <option value="">--Select--</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -121,20 +123,23 @@ async function loadSettings() {
     }
 }
 
-document.getElementById('yearSelect').onchange = function() {
-    const year = this.value;
+function updateSemesterDropdown() {
+    const yearSelect = document.getElementById('yearSelect');
+    const year = yearSelect.value;
     const semSelect = document.getElementById('semesterSelect');
     semSelect.innerHTML = '<option value="">--Select--</option>';
     if (year) {
         const sems = {'1':['1','2'],'2':['3','4'],'3':['5','6'],'4':['7','8']}[year];
+        const suffixMap = { '1': 'st', '2': 'nd', '3': 'rd' };
         sems.forEach(s => {
+            const suffix = suffixMap[s] || 'th';
             const opt = document.createElement('option');
             opt.value = s;
-            opt.textContent = 'Semester ' + s;
+            opt.textContent = s + suffix + ' Semester';
             semSelect.appendChild(opt);
         });
     }
-};
+}
 
 async function loadSubjects() {
     const ay = document.getElementById('academicYear').value.trim();
@@ -351,6 +356,10 @@ async function generateTimetableNow() {
     } finally {
         document.getElementById('loadingOverlay').style.display = 'none';
     }
+}
+
+function goBackToDashboard() {
+    window.location.href = 'page.htm?dept=' + encodeURIComponent(currentDepartment);
 }
 
 loadSettings();

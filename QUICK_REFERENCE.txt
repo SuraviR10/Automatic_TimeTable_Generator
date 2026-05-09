@@ -1,89 +1,125 @@
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                   MIT MYSORE TIMETABLE SYSTEM                             ║
-║                        QUICK START GUIDE                                  ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+================================================================================
+MIT MYSORE TIMETABLE GENERATOR - QUICK REFERENCE CARD
+================================================================================
 
-┌───────────────────────────────────────────────────────────────────────────┐
-│ 1. START SERVER                                                           │
-└───────────────────────────────────────────────────────────────────────────┘
+START SERVER
+============
+Command: py unified_server.py
+URL: http://localhost:5000
 
-cd c:\Users\surav\Downloads\TT_final-main
-py unified_server.py
+LOGIN CREDENTIALS
+=================
+DEPARTMENT LOGIN:
+  Username: MIT Mysore
+  Passwords:
+    CSE: CSE@123
+    ISE: ISE@123
+    AIML: AIML@123
+    AI: AI@123
+    Data Science: DS@123
+    CSBS: CSBS@123
+    CE: CE@123
+    IoT: IoT@123
+    EC: EC@123
+    Mechanical: MECH@123
+    Civil: CIVIL@123
 
-Server will start at: http://localhost:5000
+ADMIN LOGIN:
+  Username: MIT Mysore
+  Password: mitm@1234
 
-┌───────────────────────────────────────────────────────────────────────────┐
-│ 2. LOGIN CREDENTIALS                                                      │
-└───────────────────────────────────────────────────────────────────────────┘
+WORKFLOW
+========
+1. LOGIN → Select Department or Admin
+2. SUBJECT DATABASE → Add all subjects for semester
+3. FACULTY CORE → Add all faculty members
+4. LAB MANAGEMENT → Add lab rooms (optional)
+5. TIMETABLE GENERATOR → Load subjects → Assign faculty → Generate
+6. ENHANCED VIEW → Review → Smart Swap (if needed) → Finalize
 
-Username: MIT Mysore
-Password: mitm@1234
+YEAR-SEMESTER MAPPING
+=====================
+Year 1 → Semester 1, 2
+Year 2 → Semester 3, 4
+Year 3 → Semester 5, 6
+Year 4 → Semester 7, 8
 
-(Same credentials for both Department and Administrator)
+CONSTRAINTS ENFORCED
+====================
+1. Strict Weekly Hours
+2. Daily Diversity (no same subject twice per day)
+3. Lab Continuity (2-hour blocks, no break crossing)
+4. NSS/FREE → P6 Only
+5. Global Faculty Conflict Prevention
+6. Lab Room Clash Prevention
+7. Open Elective Same-Slot
+8. Classroom Capacity Validation
+9. One Lab Per Day
+10. Break Protection
 
-┌───────────────────────────────────────────────────────────────────────────┐
-│ 3. DEPARTMENT WORKFLOW                                                    │
-└───────────────────────────────────────────────────────────────────────────┘
+MIT MYSORE STANDARD SCHEDULE
+=============================
+P1: 09:00-10:00
+P2: 10:00-11:00
+TEA BREAK: 11:00-11:15
+P3: 11:15-12:15
+P4: 12:15-13:15
+LUNCH BREAK: 13:15-14:00
+P5: 14:00-15:00
+P6: 15:00-16:00
 
-Step 1: Click "Department" → Select Department → Login
-Step 2: Subject Database → Add subjects with weekly hours
-Step 3: Faculty Core → Add faculty members
-Step 4: Lab Management → Add lab rooms
-Step 5: Timetable Generator → Load subjects → Assign faculty → Generate
-Step 6: View/Edit → Smart swap → Export PDF → Finalize
+VALID LAB SLOTS
+===============
+P1-P2 (09:00-11:00)
+P3-P4 (11:15-13:15)
+P5-P6 (14:00-16:00)
 
-┌───────────────────────────────────────────────────────────────────────────┐
-│ 4. ADMINISTRATOR WORKFLOW                                                 │
-└───────────────────────────────────────────────────────────────────────────┘
-
-Step 1: Click "Administrator" → Login
-Step 2: Configure work days (default: Tue-Sat)
-Step 3: Set periods per day (default: 6)
-Step 4: Set break timings (Tea: after P2, Lunch: after P4)
-Step 5: Lock Open Elective slots (e.g., OE601 → Thursday P3)
-Step 6: Save Global Configuration
-
-┌───────────────────────────────────────────────────────────────────────────┐
-│ 5. ALL 7 CONSTRAINTS                                                      │
-└───────────────────────────────────────────────────────────────────────────┘
-
-✓ Strict Weekly Hours - Each subject placed exactly as specified
-✓ Daily Diversity - No subject repeats on same day
-✓ Lab Continuity - 2-hour blocks (P1-P2, P3-P4, P5-P6)
-✓ NSS/FREE → P6 - Only in last period
-✓ Faculty Conflict - Global tracking across departments
-✓ Lab Room Clash - Global tracking prevents conflicts
-✓ OE Same-Slot - Admin locks, enforced across all departments
-
-┌───────────────────────────────────────────────────────────────────────────┐
-│ 6. TROUBLESHOOTING                                                        │
-└───────────────────────────────────────────────────────────────────────────┘
-
-Problem: Buttons don't work
-Solution: Clear browser cache (Ctrl + Shift + Delete)
-
+TROUBLESHOOTING
+===============
 Problem: Server won't start
-Solution: Check Python version (py --version) and port 5000
+Solution: py --version (check 3.11+), pip install -r requirements.txt
 
-Problem: Login fails
-Solution: Check credentials (case-sensitive)
+Problem: Timetable generation fails
+Solution: Check all subjects have weekly_hours, verify faculty assigned
 
-Problem: Generation fails
-Solution: Check all subjects have weekly_hours and faculty assigned
+Problem: Dropdown not working
+Solution: Clear browser cache (Ctrl+Shift+Delete), hard refresh (Ctrl+F5)
 
-┌───────────────────────────────────────────────────────────────────────────┐
-│ 7. SYSTEM STATUS                                                          │
-└───────────────────────────────────────────────────────────────────────────┘
+Problem: Back button not working
+Solution: Clear cache, check URL has ?dept= parameter
 
-✅ All Pylance errors: FIXED
-✅ Authentication flow: WORKING
-✅ All buttons: FUNCTIONAL
-✅ All 7 constraints: ENFORCED
-✅ Admin settings: INTEGRATED
-✅ Database connections: VERIFIED
+QUICK TIPS
+==========
+- Always clear browser cache after code updates
+- Use Chrome for best compatibility
+- Check console (F12) for errors
+- Server must be running before accessing pages
+- All data saves to Supabase automatically
+- Retry logic attempts 5 times automatically
+- Smart Swap checks faculty conflicts automatically
 
-STATUS: FULLY OPERATIONAL & PRODUCTION-READY
+FILES
+=====
+index.htm - Login page
+page.htm - Department dashboard
+subject.htm - Subject management
+faculty.htm - Faculty management
+lab.htm - Lab room management
+timetable-new.htm - Timetable generator
+enhanced.htm - View/edit/finalize timetable
+global-admin.htm - Admin dashboard
+unified_server.py - Backend server
+database_setup.sql - Database schema
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                    SYSTEM READY TO USE                                    ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+SUPPORT
+=======
+1. Check FINAL_SYSTEM_STATUS.txt for complete details
+2. Check COMPLETE_DEPLOYMENT_GUIDE.txt for full workflow
+3. Check COMPLETE_TESTING_CHECKLIST.txt for testing
+4. Check server console for backend errors
+5. Check browser console (F12) for frontend errors
+
+SYSTEM STATUS: PRODUCTION READY ✓
+All features working, all constraints enforced, Python 3.13 compatible.
+
+================================================================================

@@ -622,11 +622,11 @@
                                 </div>
                             </div>
                             <div style="display: flex; gap: 8px; margin-top: 15px;">
-                                <a href="enhanced.htm?section=${group.section}&year=${group.year}&semester=${group.semester}&dept=${currentDepartment}" 
+                                <button onclick="viewTimetable('${currentDepartment}', '${group.academic_year}', ${group.year}, ${group.semester}, '${group.section}')" 
                                    class="btn btn-sm">
                                     <span>👁️</span>
                                     View
-                                </a>
+                                </button>
                                 <a href="faculty-timetable.htm?section=${group.section}&dept=${currentDepartment}" 
                                    class="btn btn-sm" style="background: #059669;">
                                     <span>👤</span>
@@ -798,6 +798,49 @@
                 }, 500);
             }
         }
+        async function viewTimetable(department, academicYear, year, semester, section) {
+            try {
+                // Fetch complete timetable data
+                const { data: timetableEntries, error } = await supabase
+                    .from('timetables')
+                    .select('*')
+                    .eq('department', department)
+                    .eq('academic_year', academicYear)
+                    .eq('year', year)
+                    .eq('semester', semester)
+                    .order('section')
+                    .order('day')
+                    .order('time_slot');
+
+                if (error) throw error;
+
+                if (!timetableEntries || timetableEntries.length === 0) {
+                    alert('No timetable found for this configuration');
+                    return;
+                }
+
+                const uniqueSections = [...new Set(timetableEntries.map(s => s.section))].sort();
+
+                // Store comprehensive timetable data for enhanced.htm
+                const timetableData = {
+                    department: department,
+                    academicYear: academicYear,
+                    year: year,
+                    semester: semester,
+                    sections: uniqueSections.map(s => ({ name: s })),
+                    isFromVault: true,
+                    vaultData: timetableEntries
+                };
+
+                localStorage.setItem('timetableData', JSON.stringify(timetableData));
+                window.location.href = '/enhanced.htm';
+
+            } catch (error) {
+                console.error('Error loading timetable:', error);
+                alert('Error loading timetable: ' + error.message);
+            }
+        }
+
     </script>
 </body>
 </html>

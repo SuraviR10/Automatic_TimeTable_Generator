@@ -208,7 +208,21 @@ CREATE TABLE IF NOT EXISTS lab_rooms (
 );
 
 -- =====================================================
--- 11. ADMIN USERS TABLE (Separate from department users)
+-- 11. CLASSROOMS TABLE (Global classroom management)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS classrooms (
+    id BIGSERIAL PRIMARY KEY,
+    room_number VARCHAR(50) UNIQUE NOT NULL,
+    capacity INTEGER NOT NULL CHECK (capacity >= 1 AND capacity <= 500),
+    type VARCHAR(20) NOT NULL CHECK (type IN ('theory', 'lab')),
+    location VARCHAR(100),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- =====================================================
+-- 12. ADMIN USERS TABLE (Separate from department users)
 -- =====================================================
 CREATE TABLE IF NOT EXISTS admin_users (
     id BIGSERIAL PRIMARY KEY,
@@ -245,6 +259,8 @@ CREATE INDEX IF NOT EXISTS idx_assignments_faculty ON faculty_assignments(facult
 
 CREATE INDEX IF NOT EXISTS idx_open_electives_lookup ON open_electives(academic_year, year, semester);
 CREATE INDEX IF NOT EXISTS idx_lab_rooms_department ON lab_rooms(department, is_active);
+CREATE INDEX IF NOT EXISTS idx_classrooms_type ON classrooms(type, is_active);
+CREATE INDEX IF NOT EXISTS idx_classrooms_capacity ON classrooms(capacity);
 
 -- =====================================================
 -- 13. UNIQUE CONSTRAINTS (Fixed syntax)
